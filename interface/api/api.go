@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"memo_sample/usecase"
+	"memo_sample/usecase/input"
 )
 
 // NewAPI Get API instance
@@ -25,12 +26,14 @@ type API struct {
 func (a API) PostMemo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	id, err := a.memo.Post(ctx, r.URL.Query().Get("text"))
+	ipt := &input.PostMemo{Text: r.URL.Query().Get("text")}
+	id, err := a.memo.Post(ctx, *ipt)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	v, err := a.memo.FindJSON(ctx, id)
+	iptf := &input.FindMemo{ID: id}
+	v, err := a.memo.FindJSON(ctx, *iptf)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

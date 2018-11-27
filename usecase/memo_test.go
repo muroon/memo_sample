@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"memo_sample/adapter/memory"
-
+	"memo_sample/usecase/input"
 )
 
 func TestMemoPostAndGetSuccess(t *testing.T) {
@@ -18,12 +18,19 @@ func TestMemoPostAndGetSuccess(t *testing.T) {
 	
 	text := "First Memo"
 
-	id, err := memo.Post(ctx, text)
+	ipt := &input.PostMemo{ Text: text }
+
+	if err := memo.ValidatePost(*ipt); err != nil {
+		t.Error("failed TestMemoPostAndGetSuccess ValidatePost", err)
+	}
+
+	id, err := memo.Post(ctx, *ipt)
 	if err != nil {
 		t.Error("failed TestMemoPostAndGetSuccess Post", err)
 	}
 
-	m, err := memo.Find(ctx, id)
+	iptf := &input.FindMemo{ID: id}
+	m, err := memo.Find(ctx, *iptf)
 	if err != nil {
 		t.Error("failed TestMemoPostAndGetSuccess Get", err, id)
 	}
@@ -47,12 +54,15 @@ func TestMemoGetJsonSuccess(t *testing.T) {
 	
 	text := "Next Memo"
 
-	id, err := memo.Post(ctx, text)
+	ipt := &input.PostMemo{ Text: text }
+
+	id, err := memo.Post(ctx, *ipt)
 	if err != nil {
 		t.Error("failed TestMemoPostAndGetSuccess Post", err)
 	}
 
-	m, err := memo.FindJSON(ctx, id)
+	iptf := &input.FindMemo{ID: id}
+	m, err := memo.FindJSON(ctx, *iptf)
 	if err != nil {
 		t.Error("failed TestMemoPostAndGetSuccess FindJSON", err, id)
 	}
