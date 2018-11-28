@@ -80,7 +80,7 @@ func TestMemoSaveInDBSuccess(t *testing.T) {
 		ID: id,
 		Text: "Second",
 	}
-	repo.Save(ctx, memo)
+	err = repo.Save(ctx, memo)
 
 	memoFind, err = repo.Find(ctx, id)
 	if err != nil || memoFind.ID != id {
@@ -97,4 +97,60 @@ func TestMemoSaveInDBSuccess(t *testing.T) {
 	for _, v := range list {
 		t.Logf("TestMemoSaveInMemorySuccess GetAll MemoRepository id:%d, text:%s", v.ID, v.Text)
 	}
+}
+
+func TestMemoTransactionCommitSuccess(t *testing.T) {
+	connectTestDB()
+	defer closeTestDB()
+
+	repo := getMemoRepositoryForTest()
+
+	ctx := context.Background()
+
+	ctx, err := repo.Begin(ctx)
+	if err != nil {
+		repo.Rollback(ctx)
+		panic(err)
+	}
+
+	memo := &model.Memo{
+		Text: "Transaction Commit Test",
+	}
+	err = repo.Save(ctx, memo)
+	if err != nil {
+		repo.Rollback(ctx)
+		panic(err)
+	}
+
+	_, err = repo.Commit(ctx)
+	if err != nil {
+		repo.Rollback(ctx)
+		panic(err)
+	}
+}
+
+func TestMemoTransactionRollbackSuccess(t *testing.T) {
+	connectTestDB()
+	defer closeTestDB()
+
+	repo := getMemoRepositoryForTest()
+
+	ctx := context.Background()
+
+	ctx, err := repo.Begin(ctx)
+	if err != nil {
+		repo.Rollback(ctx)
+		panic(err)
+	}
+
+	memo := &model.Memo{
+		Text: "Transaction Rollback Test",
+	}
+	err = repo.Save(ctx, memo)
+	if err != nil {
+		repo.Rollback(ctx)
+		panic(err)
+	}
+
+	repo.Rollback(ctx)
 }
