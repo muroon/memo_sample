@@ -13,6 +13,6 @@ func InjectMemoInMemoryRepository() repository.MemoRepository {
 }
 
 // InjectMemoDBRepository inject repository
-func InjectMemoDBRepository(info *infra.InfraInfo) repository.MemoRepository {
+func InjectMemoDBRepository(info *infra.DbInfo) repository.MemoRepository {
 	return &db.MemoRepository{DB: info.DB}
 }

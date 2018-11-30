@@ -13,6 +13,6 @@ func InjectMemoryAPI() api.API {
 
 // InjectDBAPI inject api
 func InjectDBAPI() api.API {
-	repo := InjectMemoDBRepository(infra.NewInfraInfo()) // DB
+	repo := InjectMemoDBRepository(infra.NewDBInfo()) // DB
 	return api.NewAPI(InjectMemoUsecase(repo))
 }

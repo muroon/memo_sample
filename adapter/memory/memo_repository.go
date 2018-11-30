@@ -26,8 +26,8 @@ func (m *MemoRepository) Commit(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-// GenerateID generate Key
-func (m *MemoRepository) GenerateID(ctx context.Context) (int, error) {
+// generateID generate Key
+func (m *MemoRepository) generateID(ctx context.Context) (int, error) {
 	const initID int = 1
 
 	if len(m.memoList) == 0 {
@@ -43,9 +43,19 @@ func (m *MemoRepository) GenerateID(ctx context.Context) (int, error) {
 }
 
 // Save save Memo Data
-func (m *MemoRepository) Save(ctx context.Context, memo *model.Memo) error {	
+func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
+	id, err := m.generateID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	memo := &model.Memo{
+		ID: id,
+		Text: text,
+	}
+
 	m.memoList = append(m.memoList, memo)
-	return nil
+	return memo, nil
 }
 
 // Find get Memo Data by ID

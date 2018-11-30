@@ -3,7 +3,6 @@ package db
 import (
 	"testing"
 	"context"
-	"memo_sample/domain/model"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -28,22 +27,6 @@ func getMemoRepositoryForTest() *MemoRepository {
 	return &MemoRepository{DB: db}
 }
 
-func TestMemoFirstIDInDBSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
-
-	repo := getMemoRepositoryForTest()
-
-	ctx := context.Background()
-
-	id, err := repo.GenerateID(ctx)
-	if err != nil {
-		t.Error("failed TestMemoFirstIDInMemorySuccess GenerateID")
-	}
-
-	t.Log("TestMemoFirstIDInMemorySuccess FirstID:", id)
-}
-
 func TestMemoSaveInDBSuccess(t *testing.T) {
 	connectTestDB()
 	defer closeTestDB()
@@ -53,44 +36,32 @@ func TestMemoSaveInDBSuccess(t *testing.T) {
 	ctx := context.Background()
 
 	// 1件名
-	id, err := repo.GenerateID(ctx)
+	memo, err := repo.Save(ctx, "First")
 	if err != nil {
-		t.Error("failed TestMemoSaveInMemorySuccess GenerateID", err)
+		t.Error("failed TestMemoSaveInMemorySuccess Save", err)
 	}
 
-	memo := &model.Memo{
-		ID: id,
-		Text: "First",
-	}
-	repo.Save(ctx, memo)
-
-	memoFind, err := repo.Find(ctx, id)
-	if err != nil || memoFind.ID != id {
+	memoFind, err := repo.Find(ctx, memo.ID)
+	if err != nil || memoFind.ID != memo.ID {
 		t.Error("failed TestMemoSaveInMemorySuccess Find", err, memoFind.ID)
 	}
 	t.Logf("TestMemoSaveInMemorySuccess Find MemoRepository id:%d, text:%s", memoFind.ID, memoFind.Text)
 
 	// 2件名
-	id, err = repo.GenerateID(ctx)
+	memo, err = repo.Save(ctx, "Second")
 	if err != nil {
 		t.Error("failed TestMemoSaveInMemorySuccess GenerateID", err)
 	}
 
-	memo = &model.Memo{
-		ID: id,
-		Text: "Second",
-	}
-	err = repo.Save(ctx, memo)
-
-	memoFind, err = repo.Find(ctx, id)
-	if err != nil || memoFind.ID != id {
+	memoFind, err = repo.Find(ctx, memo.ID)
+	if err != nil || memoFind.ID != memo.ID {
 		t.Error("failed TestMemoSaveInMemorySuccess Find", err, memoFind.ID)
 	}
 	t.Logf("TestMemoSaveInMemorySuccess Find MemoRepository id:%d, text:%s", memoFind.ID, memoFind.Text)
 
 	//　全件取得
 	list, err := repo.GetAll(ctx)
-	if err != nil || len(list) != 2 {
+	if err != nil {
 		t.Error("failed TestMemoSaveInMemorySuccess Find", err, len(list))
 	}
 
@@ -113,10 +84,7 @@ func TestMemoTransactionCommitSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	memo := &model.Memo{
-		Text: "Transaction Commit Test",
-	}
-	err = repo.Save(ctx, memo)
+	_, err = repo.Save(ctx, "Transaction Commit Test!")
 	if err != nil {
 		repo.Rollback(ctx)
 		panic(err)
@@ -143,10 +111,7 @@ func TestMemoTransactionRollbackSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	memo := &model.Memo{
-		Text: "Transaction Rollback Test",
-	}
-	err = repo.Save(ctx, memo)
+	_, err = repo.Save(ctx, "Transaction Rollback Test")
 	if err != nil {
 		repo.Rollback(ctx)
 		panic(err)

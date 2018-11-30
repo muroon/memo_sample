@@ -51,34 +51,23 @@ func (m *MemoRepository) isTx(ctx context.Context) bool {
 	return false
 }
 
-// GenerateID generate Key
-func (m *MemoRepository) GenerateID(ctx context.Context) (int, error) {
-	lastID := 0
-
-	rows, err := m.DB.Query("select id from memo")
-    if err != nil {
-        return 0, err
-    }
-	
-	for rows.Next() {
-		err := rows.Scan(&lastID)
-		if err != nil {
-			return 0, err
-		}
-	}
-	return lastID + 1, nil
-}
-
 // Save save Memo Data
-func (m *MemoRepository) Save(ctx context.Context, memo *model.Memo) error {
+func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
 	var err error
+	var res sql.Result
 	if m.isTx(ctx) {
-		_, err = m.tx.Exec("insert into memo(text) values(?)", memo.Text)
+		res, err = m.tx.Exec("insert into memo(text) values(?)", text)
+
 	} else {
-		_, err = m.DB.Exec("insert into memo(text) values(?)", memo.Text)
+		res, err = m.DB.Exec("insert into memo(text) values(?)", text)
 	}
 
-	return err
+	id, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Memo{ID: int(id), Text: text}, err
 }
 
 // Find get Memo Data by ID

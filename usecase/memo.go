@@ -42,18 +42,11 @@ func (m memo) ValidatePost(ipt input.PostMemo) error {
 }
 
 func (m memo) Post(ctx context.Context, ipt input.PostMemo) (int, error) {
-	id, err := m.memoRepository.GenerateID(ctx)
+	mo, err := m.memoRepository.Save(ctx, ipt.Text)
 	if err != nil {
 		return 0, err
 	}
-
-	mo := &model.Memo{
-		ID: id,
-		Text: ipt.Text,
-	}
-
-	err = m.memoRepository.Save(ctx, mo)
-	return id, err
+	return mo.ID, err
 }
 
 func (m memo) ValidateFind(ipt input.FindMemo) error {

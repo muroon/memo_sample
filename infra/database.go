@@ -5,6 +5,16 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// DbInfo DB情報
+type DbInfo struct {
+	DB *sql.DB
+}
+
+// NewDbInfo インフラ情報を渡す
+func NewDbInfo() *DbInfo {
+	return &DbInfo {DB: db}
+}
+
 var db *sql.DB;
 
 // ConnectDB DB接続

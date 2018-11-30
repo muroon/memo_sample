@@ -3,20 +3,7 @@ package memory
 import (
 	"testing" // テストで使える関数・構造体が用意されているパッケージをimport
 	"context"
-	"memo_sample/domain/model"
 )
-
-func TestMemoFirstIDInMemorySuccess(t *testing.T) {
-	ctx := context.Background()
-
-	repo := &MemoRepository{}
-	id, err := repo.GenerateID(ctx)
-	if err != nil {
-		t.Error("failed TestMemoFirstIDInMemorySuccess GenerateID")
-	}
-
-	t.Log("TestMemoFirstIDInMemorySuccess FirstID:", id)
-}
 
 func TestMemoSaveInMemorySuccess(t *testing.T) {
 	ctx := context.Background()
@@ -24,37 +11,25 @@ func TestMemoSaveInMemorySuccess(t *testing.T) {
 	repo := &MemoRepository{}
 
 	// 1件名
-	id, err := repo.GenerateID(ctx)
+	memo, err := repo.Save(ctx, "First")
 	if err != nil {
-		t.Error("failed TestMemoSaveInMemorySuccess GenerateID", err)
+		t.Error("failed TestMemoSaveInMemorySuccess Save", err)
 	}
 
-	memo := &model.Memo{
-		ID: id,
-		Text: "First",
-	}
-	repo.Save(ctx, memo)
-
-	memoFind, err := repo.Find(ctx, id)
-	if err != nil || memoFind.ID != id {
+	memoFind, err := repo.Find(ctx, memo.ID)
+	if err != nil || memoFind.ID != memo.ID {
 		t.Error("failed TestMemoSaveInMemorySuccess Find", err, memoFind.ID)
 	}
 	t.Logf("TestMemoSaveInMemorySuccess Find MemoRepository id:%d, text:%s", memoFind.ID, memoFind.Text)
 
 	// 2件名
-	id, err = repo.GenerateID(ctx)
+	memo, err = repo.Save(ctx, "Second")
 	if err != nil {
-		t.Error("failed TestMemoSaveInMemorySuccess GenerateID", err)
+		t.Error("failed TestMemoSaveInMemorySuccess Save", err)
 	}
 
-	memo = &model.Memo{
-		ID: id,
-		Text: "Second",
-	}
-	repo.Save(ctx, memo)
-
-	memoFind, err = repo.Find(ctx, id)
-	if err != nil || memoFind.ID != id {
+	memoFind, err = repo.Find(ctx, memo.ID)
+	if err != nil || memoFind.ID != memo.ID {
 		t.Error("failed TestMemoSaveInMemorySuccess Find", err, memoFind.ID)
 	}
 	t.Logf("TestMemoSaveInMemorySuccess Find MemoRepository id:%d, text:%s", memoFind.ID, memoFind.Text)
