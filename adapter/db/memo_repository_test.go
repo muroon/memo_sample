@@ -1,13 +1,15 @@
 package db
 
 import (
-	"testing"
 	"context"
 	"database/sql"
+	"testing"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var db *sql.DB;
+var db *sql.DB
+var tx *sql.Tx
 
 // ConnectDB DB接続
 func connectTestDB() {
@@ -20,11 +22,11 @@ func connectTestDB() {
 
 // CloseDB DB切断
 func closeTestDB() {
-	db.Close() 
+	db.Close()
 }
 
 func getMemoRepositoryForTest() *MemoRepository {
-	return &MemoRepository{DB: db}
+	return NewDBMemoRepository(db, tx)
 }
 
 func TestMemoSaveInDBSuccess(t *testing.T) {
@@ -84,7 +86,7 @@ func TestMemoTransactionCommitSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	_, err = repo.Save(ctx, "Transaction Commit Test!")
+	_, err = repo.Save(ctx, "Transaction Commit Test")
 	if err != nil {
 		repo.Rollback(ctx)
 		panic(err)

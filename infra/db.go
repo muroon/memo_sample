@@ -2,20 +2,23 @@ package infra
 
 import (
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
 // DbInfo DB情報
 type DbInfo struct {
 	DB *sql.DB
+	Tx *sql.Tx
 }
 
-// NewDbInfo インフラ情報を渡す
-func NewDbInfo() *DbInfo {
-	return &DbInfo {DB: db}
+// NewDBInfo インフラ情報を渡す
+func NewDBInfo() *DbInfo {
+	return &DbInfo{DB: db, Tx: tx}
 }
 
-var db *sql.DB;
+var db *sql.DB
+var tx *sql.Tx
 
 // ConnectDB DB接続
 func ConnectDB() {
@@ -28,5 +31,5 @@ func ConnectDB() {
 
 // CloseDB DB切断
 func CloseDB() {
-	db.Close() 
+	db.Close()
 }

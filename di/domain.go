@@ -14,5 +14,5 @@ func InjectMemoInMemoryRepository() repository.MemoRepository {
 
 // InjectMemoDBRepository inject repository
 func InjectMemoDBRepository(info *infra.DbInfo) repository.MemoRepository {
-	return &db.MemoRepository{DB: info.DB}
+	return db.NewDBMemoRepository(info.DB, info.Tx)
 }
