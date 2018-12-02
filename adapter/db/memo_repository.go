@@ -8,64 +8,38 @@ import (
 )
 
 // NewMemoRepository get repository
-func NewMemoRepository(db *sql.DB, tx *sql.Tx) *MemoRepository {
-	return &MemoRepository{db: db, tx: tx}
+func NewMemoRepository(db *sql.DB) *MemoRepository {
+	setDB(db)
+	return &MemoRepository{}
 }
 
 // MemoRepository Memo's Repository Sub
-type MemoRepository struct {
-	db *sql.DB
-	tx *sql.Tx
-}
-
-// ContextKey key for transaction context
-type ContextKey string
-
-const (
-	txKey = "db.transaction"
-)
+type MemoRepository struct{}
 
 // Begin begin transaction
 func (m *MemoRepository) Begin(ctx context.Context) (context.Context, error) {
-	tx, err := m.db.Begin()
-	if err != nil {
-		return nil, err
-	}
-	m.tx = tx
-	ctx = context.WithValue(ctx, ContextKey(txKey), true)
-	return ctx, nil
+	return begin(ctx)
 }
 
 // Rollback rollback transaction
 func (m *MemoRepository) Rollback(ctx context.Context) (context.Context, error) {
-	m.tx.Rollback()
-	ctx = context.WithValue(ctx, ContextKey(txKey), false)
-	return ctx, nil
+	return rollback(ctx)
 }
 
 // Commit commit transaction
 func (m *MemoRepository) Commit(ctx context.Context) (context.Context, error) {
-	err := m.tx.Commit()
-	ctx = context.WithValue(ctx, ContextKey(txKey), false)
-	return ctx, err
-}
-
-func (m *MemoRepository) isTx(ctx context.Context) bool {
-	if txn, ok := ctx.Value(ContextKey(txKey)).(bool); ok {
-		return txn
-	}
-	return false
+	return commit(ctx)
 }
 
 // Save save Memo Data
 func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
 	var err error
 	var res sql.Result
-	if m.isTx(ctx) {
-		res, err = m.tx.Exec("insert into memo(text) values(?)", text)
+	if isTx(ctx) {
+		res, err = tx.Exec("insert into memo(text) values(?)", text)
 
 	} else {
-		res, err = m.db.Exec("insert into memo(text) values(?)", text)
+		res, err = db.Exec("insert into memo(text) values(?)", text)
 	}
 
 	id, err := res.LastInsertId()
@@ -94,11 +68,11 @@ func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 	var rows *sql.Rows
 	var err error
-	if m.isTx(ctx) {
-		rows, err = m.tx.Query("select * from memo")
+	if isTx(ctx) {
+		rows, err = tx.Query("select * from memo")
 
 	} else {
-		rows, err = m.db.Query("select * from memo")
+		rows, err = db.Query("select * from memo")
 	}
 
 	if err != nil {

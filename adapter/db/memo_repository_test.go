@@ -8,9 +8,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var db *sql.DB
-var tx *sql.Tx
-
 // ConnectDB DB接続
 func connectTestDB() {
 	dbconn, err := sql.Open("mysql", "root:@/memo_sample_test")
@@ -26,7 +23,7 @@ func closeTestDB() {
 }
 
 func getMemoRepositoryForTest() *MemoRepository {
-	return NewMemoRepository(db, tx)
+	return NewMemoRepository(db)
 }
 
 func TestMemoSaveInDBSuccess(t *testing.T) {
