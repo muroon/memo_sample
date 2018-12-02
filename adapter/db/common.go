@@ -8,7 +8,7 @@ import (
 var db *sql.DB
 var tx *sql.Tx
 
-// newDB db setting
+// setDB db setting
 func setDB(d *sql.DB) {
 	if db == nil {
 		db = d
@@ -47,6 +47,7 @@ func commit(ctx context.Context) (context.Context, error) {
 	return ctx, err
 }
 
+// isTx is in transaction or not
 func isTx(ctx context.Context) bool {
 	if txn, ok := ctx.Value(ContextKey(txKey)).(bool); ok {
 		return txn

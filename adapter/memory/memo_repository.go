@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"memo_sample/domain/model"
+	"strings"
 )
 
 // NewMemoRepository get repository
@@ -76,4 +77,28 @@ func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 // GetAll get all Memo Data
 func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 	return m.memoList, nil
+}
+
+// Search search memo by text
+func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo, error) {
+	list := []*model.Memo{}
+	for _, memo := range m.memoList {
+		if strings.Index(memo.Text, text) != -1 {
+			list = append(list, memo)
+		}
+	}
+	return list, nil
+}
+
+// GetAllByIDs get all Memo Data by ID
+func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, error) {
+	list := []*model.Memo{}
+	for _, memo := range m.memoList {
+		for _, id := range ids {
+			if memo.ID == id {
+				list = append(list, memo)
+			}
+		}
+	}
+	return list, nil
 }

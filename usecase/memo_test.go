@@ -12,9 +12,10 @@ func TestMemoPostAndGetSuccess(t *testing.T) {
 
 	ctx := context.Background()
 
-	repo := memory.NewMemoRepository()
+	repoM := memory.NewMemoRepository()
+	repoT := memory.NewTagRepository()
 
-	memo := NewMemo(repo)
+	memo := NewMemo(repoM, repoT)
 
 	text := "First Memo"
 
@@ -48,9 +49,10 @@ func TestMemoPostAndGetSuccess(t *testing.T) {
 func TestMemoGetJsonSuccess(t *testing.T) {
 	ctx := context.Background()
 
-	repo := memory.NewMemoRepository()
+	repoM := memory.NewMemoRepository()
+	repoT := memory.NewTagRepository()
 
-	memo := NewMemo(repo)
+	memo := NewMemo(repoM, repoT)
 
 	text := "Next Memo"
 

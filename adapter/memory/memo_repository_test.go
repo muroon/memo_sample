@@ -44,3 +44,55 @@ func TestMemoSaveInMemorySuccess(t *testing.T) {
 		t.Logf("TestMemoSaveInMemorySuccess GetAll MemoRepository id:%d, text:%s", v.ID, v.Text)
 	}
 }
+
+func TestMemoSearchSuccess(t *testing.T) {
+	repo := NewMemoRepository()
+
+	ctx := context.Background()
+
+	word := "Memo Search Test"
+	_, err := repo.Save(ctx, word)
+	if err != nil {
+		repo.Rollback(ctx)
+		panic(err)
+	}
+
+	word = "Memo"
+	list, err := repo.Search(ctx, word)
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, m := range list {
+		t.Log(m)
+	}
+}
+
+func TestMemoGetAllByIDsSuccess(t *testing.T) {
+
+	repo := NewMemoRepository()
+
+	ctx := context.Background()
+
+	word := "Dummy First"
+	memo1, err := repo.Save(ctx, word)
+	if err != nil {
+		t.Error(err)
+	}
+
+	word = "Dummy Second"
+	memo2, err := repo.Save(ctx, word)
+	if err != nil {
+		t.Error(err)
+	}
+
+	ids := []int{memo1.ID, memo2.ID}
+	list, err := repo.GetAllByIDs(ctx, ids)
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, m := range list {
+		t.Log(m)
+	}
+}

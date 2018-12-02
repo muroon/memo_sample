@@ -7,12 +7,12 @@ import (
 	"memo_sample/infra"
 )
 
-// InjectMemoInMemoryRepository inject repository
-func InjectMemoInMemoryRepository() repository.MemoRepository {
-	return memory.NewMemoRepository()
+// InjectInMemoryRepository inject repository
+func InjectInMemoryRepository() (repository.MemoRepository, repository.TagRepository) {
+	return memory.NewMemoRepository(), memory.NewTagRepository()
 }
 
-// InjectMemoDBRepository inject repository
-func InjectMemoDBRepository(info *infra.DbInfo) repository.MemoRepository {
-	return db.NewMemoRepository(info.DB)
+// InjectDBRepository inject repository
+func InjectDBRepository(info *infra.DbInfo) (repository.MemoRepository, repository.TagRepository) {
+	return db.NewMemoRepository(info.DB), db.NewTagRepository(info.DB)
 }

@@ -6,6 +6,6 @@ import (
 )
 
 // InjectMemoUsecase inject memo usecase
-func InjectMemoUsecase(memoRepository repository.MemoRepository) usecase.Memo {
-	return usecase.NewMemo(memoRepository)
+func InjectMemoUsecase(memoRepo repository.MemoRepository, tagRepo repository.TagRepository) usecase.Memo {
+	return usecase.NewMemo(memoRepo, tagRepo)
 }

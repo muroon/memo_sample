@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"memo_sample/domain/model"
+	"strconv"
+	"strings"
 )
 
 // NewMemoRepository get repository
@@ -79,12 +81,60 @@ func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 		return nil, err
 	}
 
+	return m.getModelList(rows)
+}
+
+// Search search memo by text
+func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo, error) {
+	var rows *sql.Rows
+	var err error
+	if isTx(ctx) {
+		rows, err = tx.Query("select * from memo where text like '%" + text + "%'")
+
+	} else {
+		rows, err = db.Query("select * from memo where text like '%" + text + "%'")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return m.getModelList(rows)
+}
+
+// GetAllByIDs get all Memo Data by ID
+func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, error) {
+	idvs := []string{}
+	for _, id := range ids {
+		idvs = append(idvs, strconv.Itoa(id))
+	}
+
+	query := "select * from memo where id in (" + strings.Join(idvs, ",") + ")"
+
+	var rows *sql.Rows
+	var err error
+	if isTx(ctx) {
+		rows, err = tx.Query(query)
+
+	} else {
+		rows, err = db.Query(query)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return m.getModelList(rows)
+}
+
+// getModelList get model list
+func (m *MemoRepository) getModelList(rows *sql.Rows) ([]*model.Memo, error) {
 	list := []*model.Memo{}
 	for rows.Next() {
 		mem := &model.Memo{}
 		err := rows.Scan(&mem.ID, &mem.Text)
 		if err != nil {
-			panic(err)
+			return list, err
 		}
 		list = append(list, mem)
 	}

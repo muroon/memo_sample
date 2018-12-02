@@ -3,10 +3,10 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"memo_sample/domain/repository"
 	"memo_sample/domain/model"
-	"memo_sample/usecase/output/json"
+	"memo_sample/domain/repository"
 	"memo_sample/usecase/input"
+	"memo_sample/usecase/output/json"
 )
 
 // Memo memo related interface
@@ -23,14 +23,17 @@ type Memo interface {
 // NewMemo generate memo instance
 func NewMemo(
 	memoRepository repository.MemoRepository,
+	tagRepository repository.TagRepository,
 ) Memo {
 	return memo{
 		memoRepository,
+		tagRepository,
 	}
 }
 
 type memo struct {
 	memoRepository repository.MemoRepository
+	tagRepository  repository.TagRepository
 }
 
 func (m memo) ValidatePost(ipt input.PostMemo) error {
@@ -66,8 +69,8 @@ func (m memo) GetAll(ctx context.Context) ([]*model.Memo, error) {
 }
 
 func (m memo) changeJSON(md *model.Memo) *json.Memo {
-	mj := &json.Memo {
-		ID: md.ID,
+	mj := &json.Memo{
+		ID:   md.ID,
 		Text: md.Text,
 	}
 	return mj
