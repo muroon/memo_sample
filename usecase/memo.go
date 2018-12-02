@@ -14,10 +14,12 @@ type Memo interface {
 	ValidatePost(ipt input.PostMemo) error
 	Post(ctx context.Context, ipt input.PostMemo) (int, error)
 	ValidateGet(ipt input.GetMemo) error
-	Get(ctx context.Context, ipt input.GetMemo) (*model.Memo, error)
-	GetAll(ctx context.Context) ([]*model.Memo, error)
-	GetJSON(ctx context.Context, ipt input.GetMemo) (*json.Memo, error)
-	GetAllJSON(ctx context.Context) ([]*json.Memo, error)
+	GetMemo(ctx context.Context, ipt input.GetMemo) (*json.Memo, error)
+	GetAllMemoList(ctx context.Context) ([]*json.Memo, error)
+	ValidatePostMemoAndTags(ipt input.PostMemoAndTags) error
+	PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*json.PostMemoAndTagsResult, error)
+	GetTagsByMemo(ctx context.Context, ipt input.GetTagsByMemo) ([]*json.Tag, error)
+	SearchTagsAndMemos(ctx context.Context, ipt input.SearchTagsAndMemos) (*json.SearchTagsAndMemosResult, error)
 }
 
 // NewMemo generate memo instance
@@ -60,15 +62,116 @@ func (m memo) ValidateGet(ipt input.GetMemo) error {
 	return nil
 }
 
-func (m memo) Get(ctx context.Context, ipt input.GetMemo) (*model.Memo, error) {
-	return m.memoRepository.Get(ctx, ipt.ID)
+func (m memo) GetMemo(ctx context.Context, ipt input.GetMemo) (*json.Memo, error) {
+	me, err := m.memoRepository.Get(ctx, ipt.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.convertMemoJSON(me), nil
 }
 
-func (m memo) GetAll(ctx context.Context) ([]*model.Memo, error) {
-	return m.memoRepository.GetAll(ctx)
+func (m memo) GetAllMemoList(ctx context.Context) ([]*json.Memo, error) {
+	list, err := m.memoRepository.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.convertMemoJSONList(list), nil
 }
 
-func (m memo) changeJSON(md *model.Memo) *json.Memo {
+func (m memo) ValidatePostMemoAndTags(ipt input.PostMemoAndTags) error {
+	if ipt.MemoText == "" {
+		return fmt.Errorf("text parameter(MemoText) is invalid. %s", ipt.MemoText)
+	}
+
+	for _, title := range ipt.TagTitles {
+		if title == "" {
+			return fmt.Errorf("text parameter(TagTitles) is invalid. %s", title)
+		}
+	}
+
+	return nil
+}
+
+func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*json.PostMemoAndTagsResult, error) {
+	tags := []*model.Tag{}
+
+	ctx, err := m.memoRepository.Begin(ctx)
+	if err != nil {
+		m.memoRepository.Rollback(ctx)
+		return nil, err
+	}
+
+	// Memo
+	mo, err := m.memoRepository.Save(ctx, ipt.MemoText)
+	if err != nil {
+		m.memoRepository.Rollback(ctx)
+		return nil, err
+	}
+
+	for _, title := range ipt.TagTitles {
+		// Tag
+		tg, err := m.tagRepository.Save(ctx, title)
+		if err != nil {
+			m.memoRepository.Rollback(ctx)
+			return nil, err
+		}
+		tags = append(tags, tg)
+
+		// MemoTag
+		err = m.tagRepository.SaveTagAndMemo(ctx, tg.ID, mo.ID)
+		if err != nil {
+			m.memoRepository.Rollback(ctx)
+			return nil, err
+		}
+	}
+
+	m.memoRepository.Commit(ctx)
+
+	return &json.PostMemoAndTagsResult{
+		Memo: m.convertMemoJSON(mo),
+		Tags: m.convertTagJSONList(tags),
+	}, nil
+}
+
+func (m memo) GetTagsByMemo(ctx context.Context, ipt input.GetTagsByMemo) ([]*json.Tag, error) {
+	tags, err := m.tagRepository.GetAllByMemoID(ctx, ipt.ID)
+	if err != nil {
+		return nil, err
+	}
+	return m.convertTagJSONList(tags), nil
+}
+
+func (m memo) SearchTagsAndMemos(ctx context.Context, ipt input.SearchTagsAndMemos) (*json.SearchTagsAndMemosResult, error) {
+	mIDs, err := m.tagRepository.SearchMemoIDsByTitle(ctx, ipt.TagTitle)
+	if err != nil {
+		return nil, err
+	}
+
+	memos, err := m.memoRepository.GetAllByIDs(ctx, mIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	tags := []*model.Tag{}
+	for _, mID := range mIDs {
+		tgs, err := m.tagRepository.GetAllByMemoID(ctx, mID)
+		if err != nil {
+			return nil, err
+		}
+		for _, tg := range tgs {
+			tags = append(tgs, tg)
+		}
+	}
+
+	return &json.SearchTagsAndMemosResult{
+		Tags:  m.convertTagJSONList(tags),
+		Memos: m.convertMemoJSONList(memos),
+	}, nil
+}
+
+func (m memo) convertMemoJSON(md *model.Memo) *json.Memo {
 	mj := &json.Memo{
 		ID:   md.ID,
 		Text: md.Text,
@@ -76,24 +179,26 @@ func (m memo) changeJSON(md *model.Memo) *json.Memo {
 	return mj
 }
 
-func (m memo) GetJSON(ctx context.Context, ipt input.GetMemo) (*json.Memo, error) {
-	md, err := m.Get(ctx, ipt)
-	if err != nil {
-		return nil, err
-	}
-
-	return m.changeJSON(md), nil
-}
-
-func (m memo) GetAllJSON(ctx context.Context) ([]*json.Memo, error) {
-	list, err := m.GetAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-
+func (m memo) convertMemoJSONList(list []*model.Memo) []*json.Memo {
 	listJSON := []*json.Memo{}
 	for _, v := range list {
-		listJSON = append(listJSON, m.changeJSON(v))
+		listJSON = append(listJSON, m.convertMemoJSON(v))
 	}
-	return listJSON, nil
+	return listJSON
+}
+
+func (m memo) convertTagJSON(md *model.Tag) *json.Tag {
+	mj := &json.Tag{
+		ID:    md.ID,
+		Title: md.Title,
+	}
+	return mj
+}
+
+func (m memo) convertTagJSONList(list []*model.Tag) []*json.Tag {
+	listJSON := []*json.Tag{}
+	for _, v := range list {
+		listJSON = append(listJSON, m.convertTagJSON(v))
+	}
+	return listJSON
 }

@@ -3,9 +3,9 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"net/http"
 	"memo_sample/usecase"
 	"memo_sample/usecase/input"
+	"net/http"
 )
 
 // NewAPI Get API instance
@@ -19,7 +19,7 @@ func NewAPI(
 
 // API api instance
 type API struct {
-	memo        usecase.Memo
+	memo usecase.Memo
 }
 
 // PostMemo post new memo
@@ -33,7 +33,7 @@ func (a API) PostMemo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	iptf := &input.GetMemo{ID: id}
-	v, err := a.memo.GetJSON(ctx, *iptf)
+	v, err := a.memo.GetMemo(ctx, *iptf)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -45,7 +45,7 @@ func (a API) PostMemo(w http.ResponseWriter, r *http.Request) {
 func (a API) GetMemos(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	v, err := a.memo.GetAllJSON(ctx)
+	v, err := a.memo.GetAllMemoList(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
