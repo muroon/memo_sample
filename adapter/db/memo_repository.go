@@ -7,8 +7,8 @@ import (
 	"memo_sample/domain/model"
 )
 
-// NewDBMemoRepository get repository
-func NewDBMemoRepository(db *sql.DB, tx *sql.Tx) *MemoRepository {
+// NewMemoRepository get repository
+func NewMemoRepository(db *sql.DB, tx *sql.Tx) *MemoRepository {
 	return &MemoRepository{db: db, tx: tx}
 }
 
@@ -73,11 +73,11 @@ func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, er
 		return nil, err
 	}
 
-	return m.Find(ctx, int(id))
+	return m.Get(ctx, int(id))
 }
 
-// Find get Memo Data by ID
-func (m MemoRepository) Find(ctx context.Context, id int) (*model.Memo, error) {
+// Get get Memo Data by ID
+func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 	list, err := m.GetAll(ctx)
 	if err != nil {
 		return nil, err

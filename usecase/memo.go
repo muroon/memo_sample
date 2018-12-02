@@ -13,10 +13,10 @@ import (
 type Memo interface {
 	ValidatePost(ipt input.PostMemo) error
 	Post(ctx context.Context, ipt input.PostMemo) (int, error)
-	ValidateFind(ipt input.FindMemo) error
-	Find(ctx context.Context, ipt input.FindMemo) (*model.Memo, error)
+	ValidateGet(ipt input.GetMemo) error
+	Get(ctx context.Context, ipt input.GetMemo) (*model.Memo, error)
 	GetAll(ctx context.Context) ([]*model.Memo, error)
-	FindJSON(ctx context.Context, ipt input.FindMemo) (*json.Memo, error)
+	GetJSON(ctx context.Context, ipt input.GetMemo) (*json.Memo, error)
 	GetAllJSON(ctx context.Context) ([]*json.Memo, error)
 }
 
@@ -49,7 +49,7 @@ func (m memo) Post(ctx context.Context, ipt input.PostMemo) (int, error) {
 	return mo.ID, err
 }
 
-func (m memo) ValidateFind(ipt input.FindMemo) error {
+func (m memo) ValidateGet(ipt input.GetMemo) error {
 	if ipt.ID <= 0 {
 		return fmt.Errorf("ID parameter is invalid. %d", ipt.ID)
 	}
@@ -57,8 +57,8 @@ func (m memo) ValidateFind(ipt input.FindMemo) error {
 	return nil
 }
 
-func (m memo) Find(ctx context.Context, ipt input.FindMemo) (*model.Memo, error) {
-	return m.memoRepository.Find(ctx, ipt.ID)
+func (m memo) Get(ctx context.Context, ipt input.GetMemo) (*model.Memo, error) {
+	return m.memoRepository.Get(ctx, ipt.ID)
 }
 
 func (m memo) GetAll(ctx context.Context) ([]*model.Memo, error) {
@@ -73,8 +73,8 @@ func (m memo) changeJSON(md *model.Memo) *json.Memo {
 	return mj
 }
 
-func (m memo) FindJSON(ctx context.Context, ipt input.FindMemo) (*json.Memo, error) {
-	md, err := m.Find(ctx, ipt)
+func (m memo) GetJSON(ctx context.Context, ipt input.GetMemo) (*json.Memo, error) {
+	md, err := m.Get(ctx, ipt)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,11 @@ import (
 	"memo_sample/domain/model"
 )
 
+// NewMemoRepository get repository
+func NewMemoRepository() *MemoRepository {
+	return &MemoRepository{}
+}
+
 // MemoRepository Memo's Repository Sub
 type MemoRepository struct {
 	memoList []*model.Memo
@@ -34,7 +39,7 @@ func (m *MemoRepository) generateID(ctx context.Context) (int, error) {
 		return initID, nil
 	}
 
-	var lm = m.memoList[len(m.memoList) - 1]
+	var lm = m.memoList[len(m.memoList)-1]
 	if lm == nil {
 		return initID, nil
 	}
@@ -50,7 +55,7 @@ func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, er
 	}
 
 	memo := &model.Memo{
-		ID: id,
+		ID:   id,
 		Text: text,
 	}
 
@@ -58,8 +63,8 @@ func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, er
 	return memo, nil
 }
 
-// Find get Memo Data by ID
-func (m MemoRepository) Find(ctx context.Context, id int) (*model.Memo, error) {
+// Get get Memo Data by ID
+func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 	for _, ml := range m.memoList {
 		if ml.ID == id {
 			return ml, nil

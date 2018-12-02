@@ -11,6 +11,6 @@ type MemoRepository interface {
 	Rollback(ctx context.Context) (context.Context, error)
 	Commit(ctx context.Context) (context.Context, error)
 	Save(ctx context.Context, text string) (*model.Memo, error)
-	Find(ctx context.Context, id int) (*model.Memo, error)
+	Get(ctx context.Context, id int) (*model.Memo, error)
 	GetAll(ctx context.Context) ([]*model.Memo, error)
 }

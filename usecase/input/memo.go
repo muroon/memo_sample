@@ -5,7 +5,7 @@ type PostMemo struct {
 	Text string
 }
 
-// FindMemo Input Entity For Get Memo
-type FindMemo struct {
+// GetMemo Input Entity For Get Memo
+type GetMemo struct {
 	ID int
 }

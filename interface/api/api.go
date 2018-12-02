@@ -32,8 +32,8 @@ func (a API) PostMemo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	iptf := &input.FindMemo{ID: id}
-	v, err := a.memo.FindJSON(ctx, *iptf)
+	iptf := &input.GetMemo{ID: id}
+	v, err := a.memo.GetJSON(ctx, *iptf)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
