@@ -53,6 +53,41 @@ func (a API) GetMemos(w http.ResponseWriter, r *http.Request) {
 	a.JSON(ctx, w, v)
 }
 
+// PostMemoAndTags save memo and tags
+func (a API) PostMemoAndTags(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	r.ParseForm()
+	text := r.FormValue("memo_text")
+	titles := r.Form["tag_titles[]"]
+
+	ipt := &input.PostMemoAndTags{
+		MemoText:  text,
+		TagTitles: titles,
+	}
+	v, err := a.memo.PostMemoAndTags(ctx, *ipt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	a.JSON(ctx, w, v)
+}
+
+// SearchTagsAndMemos save memo and tags
+func (a API) SearchTagsAndMemos(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	title := r.URL.Query().Get("tag_title")
+
+	ipt := &input.SearchTagsAndMemos{TagTitle: title}
+	v, err := a.memo.SearchTagsAndMemos(ctx, *ipt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	a.JSON(ctx, w, v)
+}
+
 // JSON render json format
 func (a API) JSON(ctx context.Context, w http.ResponseWriter, value interface{}) {
 	b, err := json.Marshal(value)
