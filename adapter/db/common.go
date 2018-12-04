@@ -24,7 +24,7 @@ const (
 
 // begin begin transaction
 func begin(ctx context.Context) (context.Context, error) {
-	t, err := db.Begin()
+	t, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

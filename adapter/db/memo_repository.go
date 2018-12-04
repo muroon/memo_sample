@@ -38,10 +38,9 @@ func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, er
 	var err error
 	var res sql.Result
 	if isTx(ctx) {
-		res, err = tx.Exec("insert into memo(text) values(?)", text)
-
+		res, err = tx.ExecContext(ctx, "insert into memo(text) values(?)", text)
 	} else {
-		res, err = db.Exec("insert into memo(text) values(?)", text)
+		res, err = db.ExecContext(ctx, "insert into memo(text) values(?)", text)
 	}
 
 	id, err := res.LastInsertId()
@@ -71,10 +70,9 @@ func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 	var rows *sql.Rows
 	var err error
 	if isTx(ctx) {
-		rows, err = tx.Query("select * from memo")
-
+		rows, err = tx.QueryContext(ctx, "select * from memo")
 	} else {
-		rows, err = db.Query("select * from memo")
+		rows, err = db.QueryContext(ctx, "select * from memo")
 	}
 
 	if err != nil {
@@ -89,10 +87,9 @@ func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo
 	var rows *sql.Rows
 	var err error
 	if isTx(ctx) {
-		rows, err = tx.Query("select * from memo where text like '%" + text + "%'")
-
+		rows, err = tx.QueryContext(ctx, "select * from memo where text like '%"+text+"%'")
 	} else {
-		rows, err = db.Query("select * from memo where text like '%" + text + "%'")
+		rows, err = db.QueryContext(ctx, "select * from memo where text like '%"+text+"%'")
 	}
 
 	if err != nil {
@@ -114,10 +111,9 @@ func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.M
 	var rows *sql.Rows
 	var err error
 	if isTx(ctx) {
-		rows, err = tx.Query(query)
-
+		rows, err = tx.QueryContext(ctx, query)
 	} else {
-		rows, err = db.Query(query)
+		rows, err = db.QueryContext(ctx, query)
 	}
 
 	if err != nil {
