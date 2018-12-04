@@ -35,12 +35,17 @@ func (m *TagRepository) Commit(ctx context.Context) (context.Context, error) {
 func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, error) {
 	var err error
 	var res sql.Result
+	query := "insert into tag(title) values(?)"
 	if isTx(ctx) {
-		res, err = tx.ExecContext(ctx, "insert into tag(title) values(?)", title)
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		res, err = db.ExecContext(ctx, "insert into tag(title) values(?)", title)
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return nil, err
 	}
 
+	res, err = stmt.ExecContext(ctx, title)
 	if err != nil {
 		return nil, err
 	}
@@ -71,13 +76,17 @@ func (m TagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
 func (m *TagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
 	var rows *sql.Rows
 	var err error
+	query := "select * from tag"
 	if isTx(ctx) {
-		rows, err = tx.QueryContext(ctx, "select * from tag")
-
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		rows, err = db.QueryContext(ctx, "select * from tag")
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return nil, err
 	}
 
+	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -89,12 +98,22 @@ func (m *TagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
 func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag, error) {
 	var rows *sql.Rows
 	var err error
+	query := "select * from tag where title like '%" + title + "%'"
 	if isTx(ctx) {
-		rows, err = tx.QueryContext(ctx, "select * from tag where title like '%"+title+"%'")
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		rows, err = db.QueryContext(ctx, "select * from tag where title like '%"+title+"%'")
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return nil, err
 	}
 
+	rows, err = stmt.QueryContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -105,12 +124,17 @@ func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag,
 // SaveTagAndMemo save tag and memo link
 func (m *TagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int) error {
 	var err error
+	query := "insert into tag_memo(tag_id, memo_id) values(?, ?)"
 	if isTx(ctx) {
-		_, err = tx.ExecContext(ctx, "insert into tag_memo(tag_id, memo_id) values(?, ?)", tagID, memoID)
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		_, err = db.ExecContext(ctx, "insert into tag_memo(tag_id, memo_id) values(?, ?)", tagID, memoID)
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return err
 	}
 
+	_, err = stmt.ExecContext(ctx, tagID, memoID)
 	return err
 }
 
@@ -118,12 +142,17 @@ func (m *TagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID in
 func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, error) {
 	var rows *sql.Rows
 	var err error
+	query := "select tag.* from tag, tag_memo where tag_memo.memo_id = ? and tag.id = tag_memo.tag_id"
 	if isTx(ctx) {
-		rows, err = tx.QueryContext(ctx, "select tag.* from tag, tag_memo where tag_memo.memo_id = ? and tag.id = tag_memo.tag_id", id)
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		rows, err = db.QueryContext(ctx, "select tag.* from tag, tag_memo where tag_memo.memo_id = ? and tag.id = tag_memo.tag_id", id)
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return nil, err
 	}
 
+	rows, err = stmt.QueryContext(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -135,12 +164,17 @@ func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Ta
 func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, error) {
 	var rows *sql.Rows
 	var err error
+	query := "select tag_memo.memo_id as mid from tag, tag_memo where tag.id = tag_memo.tag_id and tag.title like '%" + title + "%'"
 	if isTx(ctx) {
-		rows, err = tx.QueryContext(ctx, "select tag_memo.memo_id as mid from tag, tag_memo where tag.id = tag_memo.tag_id and tag.title like '%"+title+"%'")
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		rows, err = db.QueryContext(ctx, "select tag_memo.memo_id as mid from tag, tag_memo where tag.id = tag_memo.tag_id and tag.title like '%"+title+"%'")
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return nil, err
 	}
 
+	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
 		return nil, err
 	}

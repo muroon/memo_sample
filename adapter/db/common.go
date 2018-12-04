@@ -7,6 +7,7 @@ import (
 
 var db *sql.DB
 var tx *sql.Tx
+var stmt *sql.Stmt
 
 // setDB db setting
 func setDB(d *sql.DB) {
@@ -45,6 +46,22 @@ func commit(ctx context.Context) (context.Context, error) {
 	err := tx.Commit()
 	ctx = context.WithValue(ctx, ContextKey(txKey), false)
 	return ctx, err
+}
+
+func prepare(ctx context.Context, query string) (context.Context, error) {
+	var st *sql.Stmt
+	var err error
+	if isTx(ctx) {
+		st, err = tx.PrepareContext(ctx, query)
+	} else {
+		st, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return ctx, err
+	}
+	stmt = st
+
+	return ctx, nil
 }
 
 // isTx is in transaction or not

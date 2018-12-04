@@ -37,10 +37,19 @@ func (m *MemoRepository) Commit(ctx context.Context) (context.Context, error) {
 func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
 	var err error
 	var res sql.Result
+	query := "insert into memo(text) values(?)"
 	if isTx(ctx) {
-		res, err = tx.ExecContext(ctx, "insert into memo(text) values(?)", text)
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		res, err = db.ExecContext(ctx, "insert into memo(text) values(?)", text)
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	res, err = stmt.ExecContext(ctx, text)
+	if err != nil {
+		return nil, err
 	}
 
 	id, err := res.LastInsertId()
@@ -69,12 +78,17 @@ func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 	var rows *sql.Rows
 	var err error
+	query := "select * from memo"
 	if isTx(ctx) {
-		rows, err = tx.QueryContext(ctx, "select * from memo")
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		rows, err = db.QueryContext(ctx, "select * from memo")
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return nil, err
 	}
 
+	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -86,12 +100,17 @@ func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo, error) {
 	var rows *sql.Rows
 	var err error
+	query := "select * from memo where text like '%" + text + "%'"
 	if isTx(ctx) {
-		rows, err = tx.QueryContext(ctx, "select * from memo where text like '%"+text+"%'")
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		rows, err = db.QueryContext(ctx, "select * from memo where text like '%"+text+"%'")
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return nil, err
 	}
 
+	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -111,11 +130,15 @@ func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.M
 	var rows *sql.Rows
 	var err error
 	if isTx(ctx) {
-		rows, err = tx.QueryContext(ctx, query)
+		stmt, err = tx.PrepareContext(ctx, query)
 	} else {
-		rows, err = db.QueryContext(ctx, query)
+		stmt, err = db.PrepareContext(ctx, query)
+	}
+	if err != nil {
+		return nil, err
 	}
 
+	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
 		return nil, err
 	}

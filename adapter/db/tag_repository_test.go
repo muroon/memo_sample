@@ -217,6 +217,13 @@ func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 		panic(err)
 	}
 
+	tag2, err := repoT.Get(ctx, tag.ID)
+	if err != nil {
+		repoT.Rollback(ctx)
+		panic(err)
+	}
+	t.Log(tag2)
+
 	ctx, err = repoM.Commit(ctx)
 	if err != nil {
 		repoM.Rollback(ctx)
