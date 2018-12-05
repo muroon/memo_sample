@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"testing"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 func getTagRepositoryForTest() *TagRepository {
