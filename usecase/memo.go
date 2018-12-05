@@ -47,7 +47,7 @@ func (m memo) ValidatePost(ipt input.PostMemo) error {
 }
 
 func (m memo) Post(ctx context.Context, ipt input.PostMemo) (int, error) {
-	mo, err := m.memoRepository.Save(ctx, ipt.Text)
+	mo, _, err := m.memoRepository.Save(ctx, ipt.Text)
 	if err != nil {
 		return 0, err
 	}
@@ -63,7 +63,7 @@ func (m memo) ValidateGet(ipt input.GetMemo) error {
 }
 
 func (m memo) GetMemo(ctx context.Context, ipt input.GetMemo) (*json.Memo, error) {
-	me, err := m.memoRepository.Get(ctx, ipt.ID)
+	me, _, err := m.memoRepository.Get(ctx, ipt.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (m memo) GetMemo(ctx context.Context, ipt input.GetMemo) (*json.Memo, error
 }
 
 func (m memo) GetAllMemoList(ctx context.Context) ([]*json.Memo, error) {
-	list, err := m.memoRepository.GetAll(ctx)
+	list, _, err := m.memoRepository.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*
 	}
 
 	// Memo
-	mo, err := m.memoRepository.Save(ctx, ipt.MemoText)
+	mo, ctx, err := m.memoRepository.Save(ctx, ipt.MemoText)
 	if err != nil {
 		m.memoRepository.Rollback(ctx)
 		return nil, err
@@ -112,7 +112,7 @@ func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*
 
 	for _, title := range ipt.TagTitles {
 		// Tag
-		tg, err := m.tagRepository.Save(ctx, title)
+		tg, ctx, err := m.tagRepository.Save(ctx, title)
 		if err != nil {
 			m.memoRepository.Rollback(ctx)
 			return nil, err
@@ -120,7 +120,7 @@ func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*
 		tags = append(tags, tg)
 
 		// MemoTag
-		err = m.tagRepository.SaveTagAndMemo(ctx, tg.ID, mo.ID)
+		ctx, err = m.tagRepository.SaveTagAndMemo(ctx, tg.ID, mo.ID)
 		if err != nil {
 			m.memoRepository.Rollback(ctx)
 			return nil, err
@@ -136,7 +136,7 @@ func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*
 }
 
 func (m memo) GetTagsByMemo(ctx context.Context, ipt input.GetTagsByMemo) ([]*json.Tag, error) {
-	tags, err := m.tagRepository.GetAllByMemoID(ctx, ipt.ID)
+	tags, _, err := m.tagRepository.GetAllByMemoID(ctx, ipt.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -144,19 +144,19 @@ func (m memo) GetTagsByMemo(ctx context.Context, ipt input.GetTagsByMemo) ([]*js
 }
 
 func (m memo) SearchTagsAndMemos(ctx context.Context, ipt input.SearchTagsAndMemos) (*json.SearchTagsAndMemosResult, error) {
-	mIDs, err := m.tagRepository.SearchMemoIDsByTitle(ctx, ipt.TagTitle)
+	mIDs, ctx, err := m.tagRepository.SearchMemoIDsByTitle(ctx, ipt.TagTitle)
 	if err != nil {
 		return nil, err
 	}
 
-	memos, err := m.memoRepository.GetAllByIDs(ctx, mIDs)
+	memos, ctx, err := m.memoRepository.GetAllByIDs(ctx, mIDs)
 	if err != nil {
 		return nil, err
 	}
 
 	tags := []*model.Tag{}
 	for _, mID := range mIDs {
-		tgs, err := m.tagRepository.GetAllByMemoID(ctx, mID)
+		tgs, _, err := m.tagRepository.GetAllByMemoID(ctx, mID)
 		if err != nil {
 			return nil, err
 		}

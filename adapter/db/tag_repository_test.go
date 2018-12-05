@@ -11,28 +11,32 @@ func getTagRepositoryForTest() *TagRepository {
 }
 
 func TestTagSaveInDBSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
 
 	repo := getTagRepositoryForTest()
 
 	ctx := context.Background()
 
-	// 1件名
-	_, err := repo.Save(ctx, "Tag First")
+	connectTestDB()
+	defer closeTestDB()
+
+	tag, ctx, err := repo.Save(ctx, "Tag First")
 	if err != nil {
 		t.Error("failed TestTagSaveInTagrySuccess Save", err)
 	}
 
+	tagGet, ctx, err := repo.Get(ctx, tag.ID)
+	if err != nil || tagGet.ID != tag.ID {
+		t.Error("failed TestTagSaveInDBSuccess Get", err, tag.ID)
+	}
 }
 
 func TestTagTransactionCommitSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
-
 	repo := getTagRepositoryForTest()
 
 	ctx := context.Background()
+
+	connectTestDB()
+	defer closeTestDB()
 
 	ctx, err := repo.Begin(ctx)
 	if err != nil {
@@ -40,7 +44,7 @@ func TestTagTransactionCommitSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	_, err = repo.Save(ctx, "Transaction Commit Test")
+	_, ctx, err = repo.Save(ctx, "Transaction Commit Test")
 	if err != nil {
 		repo.Rollback(ctx)
 		panic(err)
@@ -54,13 +58,14 @@ func TestTagTransactionCommitSuccess(t *testing.T) {
 }
 
 func TestTagAndMemoTransactionCommitSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
 
 	repoT := getTagRepositoryForTest()
 	repoM := getMemoRepositoryForTest()
 
 	ctx := context.Background()
+
+	connectTestDB()
+	defer closeTestDB()
 
 	ctx, err := repoM.Begin(ctx)
 	if err != nil {
@@ -68,19 +73,19 @@ func TestTagAndMemoTransactionCommitSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	memo, err := repoM.Save(ctx, "Transaction Commit Memo")
+	memo, ctx, err := repoM.Save(ctx, "Transaction Commit Memo")
 	if err != nil {
 		repoM.Rollback(ctx)
 		panic(err)
 	}
 
-	tag, err := repoT.Save(ctx, "Transaction Commit Tag")
+	tag, ctx, err := repoT.Save(ctx, "Transaction Commit Tag")
 	if err != nil {
 		repoT.Rollback(ctx)
 		panic(err)
 	}
 
-	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
+	ctx, err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
 		repoT.Rollback(ctx)
 		panic(err)
@@ -94,13 +99,14 @@ func TestTagAndMemoTransactionCommitSuccess(t *testing.T) {
 }
 
 func TestTagAndMemoTransactionRollbackSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
 
 	repoT := getTagRepositoryForTest()
 	repoM := getMemoRepositoryForTest()
 
 	ctx := context.Background()
+
+	connectTestDB()
+	defer closeTestDB()
 
 	ctx, err := repoM.Begin(ctx)
 	if err != nil {
@@ -108,19 +114,19 @@ func TestTagAndMemoTransactionRollbackSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	memo, err := repoM.Save(ctx, "Transaction Rollback Memo")
+	memo, ctx, err := repoM.Save(ctx, "Transaction Rollback Memo")
 	if err != nil {
 		repoM.Rollback(ctx)
 		panic(err)
 	}
 
-	tag, err := repoT.Save(ctx, "Transaction Rollback Tag")
+	tag, ctx, err := repoT.Save(ctx, "Transaction Rollback Tag")
 	if err != nil {
 		repoT.Rollback(ctx)
 		panic(err)
 	}
 
-	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
+	ctx, err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
 		repoT.Rollback(ctx)
 		panic(err)
@@ -131,13 +137,13 @@ func TestTagAndMemoTransactionRollbackSuccess(t *testing.T) {
 }
 
 func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
-
 	repoT := getTagRepositoryForTest()
 	repoM := getMemoRepositoryForTest()
 
 	ctx := context.Background()
+
+	connectTestDB()
+	defer closeTestDB()
 
 	ctx, err := repoM.Begin(ctx)
 	if err != nil {
@@ -145,19 +151,19 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	memo, err := repoM.Save(ctx, "GetAllByMemoID Test Memo")
+	memo, ctx, err := repoM.Save(ctx, "GetAllByMemoID Test Memo")
 	if err != nil {
 		repoM.Rollback(ctx)
 		panic(err)
 	}
 
-	tag, err := repoT.Save(ctx, "GetAllByMemoID Test Tag")
+	tag, ctx, err := repoT.Save(ctx, "GetAllByMemoID Test Tag")
 	if err != nil {
 		repoT.Rollback(ctx)
 		panic(err)
 	}
 
-	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
+	ctx, err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
 		repoT.Rollback(ctx)
 		panic(err)
@@ -170,7 +176,7 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 	}
 
 	flag := false
-	list, err := repoT.GetAllByMemoID(ctx, memo.ID)
+	list, ctx, err := repoT.GetAllByMemoID(ctx, memo.ID)
 	for _, tg := range list {
 		if tg.ID == tag.ID {
 			flag = true
@@ -183,13 +189,14 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 }
 
 func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
 
 	repoT := getTagRepositoryForTest()
 	repoM := getMemoRepositoryForTest()
 
 	ctx := context.Background()
+
+	connectTestDB()
+	defer closeTestDB()
 
 	ctx, err := repoM.Begin(ctx)
 	if err != nil {
@@ -197,25 +204,25 @@ func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	memo, err := repoM.Save(ctx, "SearchMemoIDsByTitle Test Memo")
+	memo, ctx, err := repoM.Save(ctx, "SearchMemoIDsByTitle Test Memo")
 	if err != nil {
 		repoM.Rollback(ctx)
 		panic(err)
 	}
 
-	tag, err := repoT.Save(ctx, "SearchMemoIDsByTitle Test Tag")
+	tag, ctx, err := repoT.Save(ctx, "SearchMemoIDsByTitle Test Tag")
 	if err != nil {
 		repoT.Rollback(ctx)
 		panic(err)
 	}
 
-	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
+	ctx, err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
 		repoT.Rollback(ctx)
 		panic(err)
 	}
 
-	tag2, err := repoT.Get(ctx, tag.ID)
+	tag2, ctx, err := repoT.Get(ctx, tag.ID)
 	if err != nil {
 		repoT.Rollback(ctx)
 		panic(err)
@@ -229,7 +236,7 @@ func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 	}
 
 	flag := false
-	list, err := repoT.SearchMemoIDsByTitle(ctx, tag.Title)
+	list, ctx, err := repoT.SearchMemoIDsByTitle(ctx, tag.Title)
 	for _, id := range list {
 		if id == memo.ID {
 			flag = true

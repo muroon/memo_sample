@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"memo_sample/domain/model"
 )
 
@@ -32,151 +31,126 @@ func (m *TagRepository) Commit(ctx context.Context) (context.Context, error) {
 }
 
 // Save save Tag Data
-func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, error) {
+func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, context.Context, error) {
 	var err error
 	var res sql.Result
 	query := "insert into tag(title) values(?)"
-	if isTx(ctx) {
-		stmt, err = tx.PrepareContext(ctx, query)
-	} else {
-		stmt, err = db.PrepareContext(ctx, query)
-	}
+	stmt, ctx, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	res, err = stmt.ExecContext(ctx, title)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	return m.Get(ctx, int(id))
 }
 
 // Get get Tag Data by ID
-func (m TagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
-	list, err := m.GetAll(ctx)
+func (m TagRepository) Get(ctx context.Context, id int) (*model.Tag, context.Context, error) {
+	tag := &model.Tag{}
+	var err error
+	query := "select * from tag where id = ?"
+	stmt, ctx, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
-	for _, ml := range list {
-		if ml.ID == id {
-			return ml, nil
-		}
+
+	err = stmt.QueryRowContext(ctx, id).Scan(&tag.ID, &tag.Title)
+	if err != nil {
+		return nil, ctx, err
 	}
-	return nil, fmt.Errorf("Error: %s", "no tag data")
+
+	return tag, ctx, err
 }
 
 // GetAll get all Tag Data
-func (m *TagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
+func (m *TagRepository) GetAll(ctx context.Context) ([]*model.Tag, context.Context, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select * from tag"
-	if isTx(ctx) {
-		stmt, err = tx.PrepareContext(ctx, query)
-	} else {
-		stmt, err = db.PrepareContext(ctx, query)
-	}
+	stmt, ctx, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return m.getModelList(rows)
+	return m.getModelList(ctx, rows)
 }
 
 // Search search list by title
-func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag, error) {
+func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag, context.Context, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select * from tag where title like '%" + title + "%'"
-	if isTx(ctx) {
-		stmt, err = tx.PrepareContext(ctx, query)
-	} else {
-		stmt, err = db.PrepareContext(ctx, query)
-	}
+	stmt, ctx, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
-	rows, err = stmt.QueryContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return m.getModelList(rows)
+	return m.getModelList(ctx, rows)
 }
 
 // SaveTagAndMemo save tag and memo link
-func (m *TagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int) error {
+func (m *TagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int) (context.Context, error) {
 	var err error
 	query := "insert into tag_memo(tag_id, memo_id) values(?, ?)"
-	if isTx(ctx) {
-		stmt, err = tx.PrepareContext(ctx, query)
-	} else {
-		stmt, err = db.PrepareContext(ctx, query)
-	}
+	stmt, ctx, err := prepare(ctx, query)
 	if err != nil {
-		return err
+		return ctx, err
 	}
 
 	_, err = stmt.ExecContext(ctx, tagID, memoID)
-	return err
+	return ctx, err
 }
 
 // GetAllByMemoID get all Tag Data By MemoID
-func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, error) {
+func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, context.Context, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select tag.* from tag, tag_memo where tag_memo.memo_id = ? and tag.id = tag_memo.tag_id"
-	if isTx(ctx) {
-		stmt, err = tx.PrepareContext(ctx, query)
-	} else {
-		stmt, err = db.PrepareContext(ctx, query)
-	}
+	stmt, ctx, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	rows, err = stmt.QueryContext(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
-	return m.getModelList(rows)
+	return m.getModelList(ctx, rows)
 }
 
 // SearchMemoIDsByTitle search memo ids by tag's title
-func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, error) {
+func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, context.Context, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select tag_memo.memo_id as mid from tag, tag_memo where tag.id = tag_memo.tag_id and tag.title like '%" + title + "%'"
-	if isTx(ctx) {
-		stmt, err = tx.PrepareContext(ctx, query)
-	} else {
-		stmt, err = db.PrepareContext(ctx, query)
-	}
+	stmt, ctx, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	list := []int{}
@@ -184,25 +158,25 @@ func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) 
 		var mid int64
 		err := rows.Scan(&mid)
 		if err != nil {
-			return list, err
+			return list, ctx, err
 		}
 		list = append(list, int(mid))
 	}
 
-	return list, nil
+	return list, ctx, nil
 }
 
 // getModelList get model list
-func (m *TagRepository) getModelList(rows *sql.Rows) ([]*model.Tag, error) {
+func (m *TagRepository) getModelList(ctx context.Context, rows *sql.Rows) ([]*model.Tag, context.Context, error) {
 	list := []*model.Tag{}
 	for rows.Next() {
 		tag := &model.Tag{}
 		err := rows.Scan(&tag.ID, &tag.Title)
 		if err != nil {
-			return list, err
+			return list, ctx, err
 		}
 		list = append(list, tag)
 	}
 
-	return list, nil
+	return list, ctx, nil
 }

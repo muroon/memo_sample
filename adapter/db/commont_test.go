@@ -17,5 +17,6 @@ func connectTestDB() {
 
 // CloseDB DB切断
 func closeTestDB() {
+	stmt.Close()
 	db.Close()
 }

@@ -10,39 +10,38 @@ func getMemoRepositoryForTest() *MemoRepository {
 }
 
 func TestMemoSaveInDBSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
 
 	repo := getMemoRepositoryForTest()
 
 	ctx := context.Background()
 
+	connectTestDB()
+	defer closeTestDB()
+
 	// 1件名
-	memo, err := repo.Save(ctx, "First")
+	memo, ctx, err := repo.Save(ctx, "First")
 	if err != nil {
 		t.Error("failed TestMemoSaveInMemorySuccess Save", err)
 	}
 
-	memoGet, err := repo.Get(ctx, memo.ID)
+	memoGet, ctx, err := repo.Get(ctx, memo.ID)
 	if err != nil || memoGet.ID != memo.ID {
 		t.Error("failed TestMemoSaveInMemorySuccess Get", err, memoGet.ID)
 	}
-	t.Logf("TestMemoSaveInMemorySuccess Get MemoRepository id:%d, text:%s", memoGet.ID, memoGet.Text)
 
 	// 2件名
-	memo, err = repo.Save(ctx, "Second")
+	memo, ctx, err = repo.Save(ctx, "Second")
 	if err != nil {
 		t.Error("failed TestMemoSaveInMemorySuccess GenerateID", err)
 	}
 
-	memoGet, err = repo.Get(ctx, memo.ID)
+	memoGet, ctx, err = repo.Get(ctx, memo.ID)
 	if err != nil || memoGet.ID != memo.ID {
 		t.Error("failed TestMemoSaveInMemorySuccess Get", err, memoGet.ID)
 	}
-	t.Logf("TestMemoSaveInMemorySuccess Get MemoRepository id:%d, text:%s", memoGet.ID, memoGet.Text)
 
 	//　全件取得
-	list, err := repo.GetAll(ctx)
+	list, ctx, err := repo.GetAll(ctx)
 	if err != nil {
 		t.Error("failed TestMemoSaveInMemorySuccess Get", err, len(list))
 	}
@@ -53,12 +52,13 @@ func TestMemoSaveInDBSuccess(t *testing.T) {
 }
 
 func TestMemoTransactionCommitSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
 
 	repo := getMemoRepositoryForTest()
 
 	ctx := context.Background()
+
+	connectTestDB()
+	defer closeTestDB()
 
 	ctx, err := repo.Begin(ctx)
 	if err != nil {
@@ -66,7 +66,7 @@ func TestMemoTransactionCommitSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	_, err = repo.Save(ctx, "Transaction Commit Test")
+	_, ctx, err = repo.Save(ctx, "Transaction Commit Test")
 	if err != nil {
 		repo.Rollback(ctx)
 		panic(err)
@@ -80,12 +80,13 @@ func TestMemoTransactionCommitSuccess(t *testing.T) {
 }
 
 func TestMemoTransactionRollbackSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
 
 	repo := getMemoRepositoryForTest()
 
 	ctx := context.Background()
+
+	connectTestDB()
+	defer closeTestDB()
 
 	ctx, err := repo.Begin(ctx)
 	if err != nil {
@@ -93,7 +94,7 @@ func TestMemoTransactionRollbackSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	_, err = repo.Save(ctx, "Transaction Rollback Test")
+	_, ctx, err = repo.Save(ctx, "Transaction Rollback Test")
 	if err != nil {
 		repo.Rollback(ctx)
 		panic(err)
@@ -103,22 +104,23 @@ func TestMemoTransactionRollbackSuccess(t *testing.T) {
 }
 
 func TestMemoSearchSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
 
 	repo := getMemoRepositoryForTest()
 
 	ctx := context.Background()
 
+	connectTestDB()
+	defer closeTestDB()
+
 	word := "Memo Search Test"
-	_, err := repo.Save(ctx, word)
+	_, ctx, err := repo.Save(ctx, word)
 	if err != nil {
 		repo.Rollback(ctx)
 		panic(err)
 	}
 
 	word = "Memo"
-	list, err := repo.Search(ctx, word)
+	list, ctx, err := repo.Search(ctx, word)
 	if err != nil {
 		t.Error(err)
 	}
@@ -129,27 +131,28 @@ func TestMemoSearchSuccess(t *testing.T) {
 }
 
 func TestMemoGetAllByIDsSuccess(t *testing.T) {
-	connectTestDB()
-	defer closeTestDB()
 
 	repo := getMemoRepositoryForTest()
 
 	ctx := context.Background()
 
+	connectTestDB()
+	defer closeTestDB()
+
 	word := "Dummy First"
-	memo1, err := repo.Save(ctx, word)
+	memo1, ctx, err := repo.Save(ctx, word)
 	if err != nil {
 		t.Error(err)
 	}
 
 	word = "Dummy Second"
-	memo2, err := repo.Save(ctx, word)
+	memo2, ctx, err := repo.Save(ctx, word)
 	if err != nil {
 		t.Error(err)
 	}
 
 	ids := []int{memo1.ID, memo2.ID}
-	list, err := repo.GetAllByIDs(ctx, ids)
+	list, ctx, err := repo.GetAllByIDs(ctx, ids)
 	if err != nil {
 		t.Error(err)
 	}
