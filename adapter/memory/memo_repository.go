@@ -49,10 +49,10 @@ func (m *MemoRepository) generateID(ctx context.Context) (int, error) {
 }
 
 // Save save Memo Data
-func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, context.Context, error) {
+func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
 	id, err := m.generateID(ctx)
 	if err != nil {
-		return nil, ctx, err
+		return nil, err
 	}
 
 	memo := &model.Memo{
@@ -61,37 +61,37 @@ func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, co
 	}
 
 	m.memoList = append(m.memoList, memo)
-	return memo, ctx, nil
+	return memo, nil
 }
 
 // Get get Memo Data by ID
-func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, context.Context, error) {
+func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 	for _, ml := range m.memoList {
 		if ml.ID == id {
-			return ml, ctx, nil
+			return ml, nil
 		}
 	}
-	return nil, ctx, fmt.Errorf("Error: %s", "no memo data")
+	return nil, fmt.Errorf("Error: %s", "no memo data")
 }
 
 // GetAll get all Memo Data
-func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, context.Context, error) {
-	return m.memoList, ctx, nil
+func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
+	return m.memoList, nil
 }
 
 // Search search memo by text
-func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo, context.Context, error) {
+func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo, error) {
 	list := []*model.Memo{}
 	for _, memo := range m.memoList {
 		if strings.Index(memo.Text, text) != -1 {
 			list = append(list, memo)
 		}
 	}
-	return list, ctx, nil
+	return list, nil
 }
 
 // GetAllByIDs get all Memo Data by ID
-func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, context.Context, error) {
+func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, error) {
 	list := []*model.Memo{}
 	for _, memo := range m.memoList {
 		for _, id := range ids {
@@ -100,5 +100,5 @@ func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.M
 			}
 		}
 	}
-	return list, ctx, nil
+	return list, nil
 }

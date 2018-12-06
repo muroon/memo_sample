@@ -101,8 +101,7 @@ func commit(ctx context.Context) (context.Context, error) {
 }
 
 // prepare
-func prepare(ctx context.Context, query string) (*sql.Stmt, context.Context, error) {
-	//var st *sql.Stmt
+func prepare(ctx context.Context, query string) (*sql.Stmt, error) {
 	var err error
 	if isTx(ctx) {
 		stmt, err = getTx(ctx).PrepareContext(ctx, query)
@@ -110,14 +109,14 @@ func prepare(ctx context.Context, query string) (*sql.Stmt, context.Context, err
 		stmt, err = getDB(ctx).PrepareContext(ctx, query)
 	}
 	if err != nil {
-		return stmt, ctx, err
+		return stmt, err
 	}
 
 	// TODO:
 	fmt.Println("prepare query:" + query)
 	fmt.Printf("prepare isTx:%t \n", isTx(ctx))
 
-	return stmt, ctx, nil
+	return stmt, nil
 }
 
 // isTx is in transaction or not

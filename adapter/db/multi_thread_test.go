@@ -75,19 +75,19 @@ func savaContents(ctx context.Context, memoText, tagTitle string) (string, strin
 		return memoText, tagTitle, err
 	}
 
-	memo, ctx, err := repoM.Save(ctx, memoText)
+	memo, err := repoM.Save(ctx, memoText)
 	if err != nil {
 		repoM.Rollback(ctx)
 		return memoText, tagTitle, err
 	}
 
-	tag, ctx, err := repoT.Save(ctx, tagTitle)
+	tag, err := repoT.Save(ctx, tagTitle)
 	if err != nil {
 		repoT.Rollback(ctx)
 		return memoText, tagTitle, err
 	}
 
-	ctx, err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
+	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
 		repoT.Rollback(ctx)
 		return memoText, tagTitle, err
@@ -99,12 +99,12 @@ func savaContents(ctx context.Context, memoText, tagTitle string) (string, strin
 		return memoText, tagTitle, err
 	}
 
-	m, ctx, err := repoM.Get(ctx, memo.ID)
+	m, err := repoM.Get(ctx, memo.ID)
 	if err != nil {
 		return memoText, tagTitle, err
 	}
 
-	t, ctx, err := repoT.Get(ctx, tag.ID)
+	t, err := repoT.Get(ctx, tag.ID)
 	if err != nil {
 		return memoText, tagTitle, err
 	}

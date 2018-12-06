@@ -50,10 +50,10 @@ func (m *TagRepository) generateID(ctx context.Context) (int, error) {
 }
 
 // Save save Tag Data
-func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, context.Context, error) {
+func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, error) {
 	id, err := m.generateID(ctx)
 	if err != nil {
-		return nil, ctx, err
+		return nil, err
 	}
 
 	tag := &model.Tag{
@@ -62,44 +62,44 @@ func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, con
 	}
 
 	m.tagList = append(m.tagList, tag)
-	return tag, ctx, nil
+	return tag, nil
 }
 
 // Get get Tag Data by ID
-func (m TagRepository) Get(ctx context.Context, id int) (*model.Tag, context.Context, error) {
+func (m TagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
 	for _, ml := range m.tagList {
 		if ml.ID == id {
-			return ml, ctx, nil
+			return ml, nil
 		}
 	}
-	return nil, ctx, fmt.Errorf("Error: %s", "no tag data")
+	return nil, fmt.Errorf("Error: %s", "no tag data")
 }
 
 // GetAll get all Tag Data
-func (m *TagRepository) GetAll(ctx context.Context) ([]*model.Tag, context.Context, error) {
-	return m.tagList, ctx, nil
+func (m *TagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
+	return m.tagList, nil
 }
 
 // Search search tag by text
-func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag, context.Context, error) {
+func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag, error) {
 	list := []*model.Tag{}
 	for _, tag := range m.tagList {
 		if strings.Index(tag.Title, title) != -1 {
 			list = append(list, tag)
 		}
 	}
-	return list, ctx, nil
+	return list, nil
 }
 
 // SaveTagAndMemo save tag and memo link
-func (m *TagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int) (context.Context, error) {
+func (m *TagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int) error {
 	m.tagMemoMap[tagID] = memoID
 
-	return ctx, nil
+	return nil
 }
 
 // GetAllByMemoID get all Tag Data By MemoID
-func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, context.Context, error) {
+func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, error) {
 	list := []*model.Tag{}
 
 	for i, v := range m.tagMemoMap {
@@ -115,16 +115,16 @@ func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Ta
 		}
 	}
 
-	return list, ctx, nil
+	return list, nil
 }
 
 // SearchMemoIDsByTitle search memo ids by tag's title
-func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, context.Context, error) {
+func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, error) {
 	memoIDs := []int{}
 
-	list, ctx, err := m.Search(ctx, title)
+	list, err := m.Search(ctx, title)
 	if err != nil {
-		return memoIDs, ctx, err
+		return memoIDs, err
 	}
 
 	for _, tag := range list {
@@ -136,5 +136,5 @@ func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) 
 		}
 	}
 
-	return memoIDs, ctx, nil
+	return memoIDs, nil
 }

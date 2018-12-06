@@ -11,31 +11,31 @@ func TestMemoSaveInMemorySuccess(t *testing.T) {
 	repo := NewMemoRepository()
 
 	// 1件名
-	memo, ctx, err := repo.Save(ctx, "First")
+	memo, err := repo.Save(ctx, "First")
 	if err != nil {
 		t.Error("failed TestMemoSaveInMemorySuccess Save", err)
 	}
 
-	memoGet, ctx, err := repo.Get(ctx, memo.ID)
+	memoGet, err := repo.Get(ctx, memo.ID)
 	if err != nil || memoGet.ID != memo.ID {
 		t.Error("failed TestMemoSaveInMemorySuccess Get", err, memoGet.ID)
 	}
 	t.Logf("TestMemoSaveInMemorySuccess Get MemoRepository id:%d, text:%s", memoGet.ID, memoGet.Text)
 
 	// 2件名
-	memo, ctx, err = repo.Save(ctx, "Second")
+	memo, err = repo.Save(ctx, "Second")
 	if err != nil {
 		t.Error("failed TestMemoSaveInMemorySuccess Save", err)
 	}
 
-	memoGet, ctx, err = repo.Get(ctx, memo.ID)
+	memoGet, err = repo.Get(ctx, memo.ID)
 	if err != nil || memoGet.ID != memo.ID {
 		t.Error("failed TestMemoSaveInMemorySuccess Get", err, memoGet.ID)
 	}
 	t.Logf("TestMemoSaveInMemorySuccess Get MemoRepository id:%d, text:%s", memoGet.ID, memoGet.Text)
 
 	//　全件取得
-	list, ctx, err := repo.GetAll(ctx)
+	list, err := repo.GetAll(ctx)
 	if err != nil || len(list) != 2 {
 		t.Error("failed TestMemoSaveInMemorySuccess Get", err, len(list))
 	}
@@ -51,14 +51,14 @@ func TestMemoSearchSuccess(t *testing.T) {
 	ctx := context.Background()
 
 	word := "Memo Search Test"
-	_, ctx, err := repo.Save(ctx, word)
+	_, err := repo.Save(ctx, word)
 	if err != nil {
 		repo.Rollback(ctx)
 		panic(err)
 	}
 
 	word = "Memo"
-	list, ctx, err := repo.Search(ctx, word)
+	list, err := repo.Search(ctx, word)
 	if err != nil {
 		t.Error(err)
 	}
@@ -75,19 +75,19 @@ func TestMemoGetAllByIDsSuccess(t *testing.T) {
 	ctx := context.Background()
 
 	word := "Dummy First"
-	memo1, ctx, err := repo.Save(ctx, word)
+	memo1, err := repo.Save(ctx, word)
 	if err != nil {
 		t.Error(err)
 	}
 
 	word = "Dummy Second"
-	memo2, ctx, err := repo.Save(ctx, word)
+	memo2, err := repo.Save(ctx, word)
 	if err != nil {
 		t.Error(err)
 	}
 
 	ids := []int{memo1.ID, memo2.ID}
-	list, ctx, err := repo.GetAllByIDs(ctx, ids)
+	list, err := repo.GetAllByIDs(ctx, ids)
 	if err != nil {
 		t.Error(err)
 	}

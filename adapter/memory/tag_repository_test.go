@@ -12,12 +12,12 @@ func TestTagSaveInDBSuccess(t *testing.T) {
 
 	ctx := context.Background()
 
-	me, ctx, err := repo.Save(ctx, "Tag First")
+	me, err := repo.Save(ctx, "Tag First")
 	if err != nil {
 		t.Error("failed TestTagSaveInDBSuccess Save", err)
 	}
 
-	memo, ctx, err := repo.Get(ctx, me.ID)
+	memo, err := repo.Get(ctx, me.ID)
 	if err != nil {
 		t.Error("failed TestTagSaveInDBSuccess Get", err)
 	}
@@ -39,21 +39,21 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 		return
 	}
 
-	memo, ctx, err := repoM.Save(ctx, "GetAllByMemoID Test Memo")
+	memo, err := repoM.Save(ctx, "GetAllByMemoID Test Memo")
 	if err != nil {
 		repoM.Rollback(ctx)
 		t.Error(err)
 		return
 	}
 
-	tag, ctx, err := repoT.Save(ctx, "GetAllByMemoID Test Tag")
+	tag, err := repoT.Save(ctx, "GetAllByMemoID Test Tag")
 	if err != nil {
 		repoT.Rollback(ctx)
 		t.Error(err)
 		return
 	}
 
-	ctx, err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
+	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
 		repoT.Rollback(ctx)
 		t.Error(err)
@@ -70,7 +70,7 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 	t.Logf("TestTagAndMemoGetAllByMemoIDSuccess targetMemoID:%d", memo.ID)
 
 	flag := false
-	list, ctx, err := repoT.GetAllByMemoID(ctx, memo.ID)
+	list, err := repoT.GetAllByMemoID(ctx, memo.ID)
 	for _, tg := range list {
 		if tg.ID == tag.ID {
 			flag = true
@@ -97,21 +97,21 @@ func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 		return
 	}
 
-	memo, ctx, err := repoM.Save(ctx, "SearchMemoIDsByTitle Test Memo")
+	memo, err := repoM.Save(ctx, "SearchMemoIDsByTitle Test Memo")
 	if err != nil {
 		repoM.Rollback(ctx)
 		t.Error(err)
 		return
 	}
 
-	tag, ctx, err := repoT.Save(ctx, "SearchMemoIDsByTitle Test Tag")
+	tag, err := repoT.Save(ctx, "SearchMemoIDsByTitle Test Tag")
 	if err != nil {
 		repoT.Rollback(ctx)
 		t.Error(err)
 		return
 	}
 
-	ctx, err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
+	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
 		repoT.Rollback(ctx)
 		t.Error(err)
@@ -126,7 +126,7 @@ func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 	}
 
 	flag := false
-	list, ctx, err := repoT.SearchMemoIDsByTitle(ctx, tag.Title)
+	list, err := repoT.SearchMemoIDsByTitle(ctx, tag.Title)
 	for _, id := range list {
 		if id == memo.ID {
 			flag = true
