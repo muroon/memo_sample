@@ -3,23 +3,22 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"memo_sample/infra"
 	"memo_sample/usecase"
 	"memo_sample/usecase/input"
 	"net/http"
 )
 
 // NewAPI Get API instance
-func NewAPI(
-	memo usecase.Memo,
-) API {
-	return API{
-		memo,
-	}
+func NewAPI(memo usecase.Memo, log infra.Log) API {
+	return API{memo, log}
 }
 
 // API api instance
 type API struct {
 	memo usecase.Memo
+	log  infra.Log
 }
 
 // PostMemo post new memo
@@ -29,13 +28,13 @@ func (a API) PostMemo(w http.ResponseWriter, r *http.Request) {
 	ipt := &input.PostMemo{Text: r.URL.Query().Get("text")}
 	id, err := a.memo.Post(ctx, *ipt)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		a.HandleError(ctx, w, err)
 	}
 
 	iptf := &input.GetMemo{ID: id}
 	v, err := a.memo.GetMemo(ctx, *iptf)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		a.HandleError(ctx, w, err)
 	}
 
 	a.JSON(ctx, w, v)
@@ -47,7 +46,7 @@ func (a API) GetMemos(w http.ResponseWriter, r *http.Request) {
 
 	v, err := a.memo.GetAllMemoList(ctx)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		a.HandleError(ctx, w, err)
 	}
 
 	a.JSON(ctx, w, v)
@@ -67,7 +66,7 @@ func (a API) PostMemoAndTags(w http.ResponseWriter, r *http.Request) {
 	}
 	v, err := a.memo.PostMemoAndTags(ctx, *ipt)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		a.HandleError(ctx, w, err)
 	}
 
 	a.JSON(ctx, w, v)
@@ -82,10 +81,18 @@ func (a API) SearchTagsAndMemos(w http.ResponseWriter, r *http.Request) {
 	ipt := &input.SearchTagsAndMemos{TagTitle: title}
 	v, err := a.memo.SearchTagsAndMemos(ctx, *ipt)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		a.HandleError(ctx, w, err)
 	}
 
 	a.JSON(ctx, w, v)
+}
+
+// HandleError handle error
+func (a API) HandleError(ctx context.Context, w http.ResponseWriter, err error) {
+
+	a.log.Errorf("%s", fmt.Sprintf("API: %T(%v)\n", err, err))
+
+	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
 
 // JSON render json format

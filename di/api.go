@@ -7,10 +7,10 @@ import (
 
 // InjectMemoryAPI inject api
 func InjectMemoryAPI() api.API {
-	return api.NewAPI(InjectMemoUsecase(InjectInMemoryRepository()))
+	return api.NewAPI(InjectMemoUsecase(InjectInMemoryRepository()), InjectLog())
 }
 
 // InjectDBAPI inject api
 func InjectDBAPI() api.API {
-	return api.NewAPI(InjectMemoUsecase(InjectDBRepository(infra.GetDBM())))
+	return api.NewAPI(InjectMemoUsecase(InjectDBRepository(infra.GetDBM())), InjectLog())
 }
