@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"memo_sample/domain/model"
+	"memo_sample/infra"
 )
 
 // NewTagRepository get repository
-func NewTagRepository(db *sql.DB) *TagRepository {
-	setDB(db)
+func NewTagRepository(d *infra.DBM) *TagRepository {
+	setDBM(d)
 	return &TagRepository{}
 }
 

@@ -4,13 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"memo_sample/domain/model"
+	"memo_sample/infra"
 	"strconv"
 	"strings"
 )
 
 // NewMemoRepository get repository
-func NewMemoRepository(db *sql.DB) *MemoRepository {
-	setDB(db)
+func NewMemoRepository(d *infra.DBM) *MemoRepository {
+	setDBM(d)
 	return &MemoRepository{}
 }
 

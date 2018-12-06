@@ -12,5 +12,5 @@ func InjectMemoryAPI() api.API {
 
 // InjectDBAPI inject api
 func InjectDBAPI() api.API {
-	return api.NewAPI(InjectMemoUsecase(InjectDBRepository(infra.NewDBInfo())))
+	return api.NewAPI(InjectMemoUsecase(InjectDBRepository(infra.GetDBM())))
 }

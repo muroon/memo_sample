@@ -3,11 +3,12 @@ package db
 import (
 	"context"
 	"fmt"
+	"memo_sample/infra"
 	"testing"
 )
 
 func getTagRepositoryForTest() *TagRepository {
-	return NewTagRepository(db)
+	return NewTagRepository(infra.GetDBM())
 }
 
 func TestTagSaveInDBSuccess(t *testing.T) {

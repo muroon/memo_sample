@@ -2,11 +2,12 @@ package db
 
 import (
 	"context"
+	"memo_sample/infra"
 	"testing"
 )
 
 func getMemoRepositoryForTest() *MemoRepository {
-	return NewMemoRepository(db)
+	return NewMemoRepository(infra.GetDBM())
 }
 
 func TestMemoSaveInDBSuccess(t *testing.T) {
