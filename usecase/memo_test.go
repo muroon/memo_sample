@@ -3,18 +3,16 @@ package usecase
 import (
 	"context"
 	"encoding/json"
-	"memo_sample/adapter/memory"
 	"memo_sample/usecase/input"
 	"strings"
 	"testing"
 )
 
-func TestMemoGetMemoSuccess(t *testing.T) {
+func TestMemoPostAndGetMemoInMemorySuccess(t *testing.T) {
 	ctx := context.Background()
 
-	repoM := memory.NewMemoRepository()
-	repoT := memory.NewTagRepository()
-	memo := NewMemo(repoM, repoT)
+	// InMemoryでテストした場合
+	memo := NewMemo(getInMemoryRepository())
 
 	text := "Next Memo"
 
@@ -22,28 +20,71 @@ func TestMemoGetMemoSuccess(t *testing.T) {
 
 	id, err := memo.Post(ctx, *ipt)
 	if err != nil {
-		t.Error("failed TestMemoPostAndGetSuccess Post", err)
+		t.Error(err)
 	}
 
 	iptf := &input.GetMemo{ID: id}
 	m, err := memo.GetMemo(ctx, *iptf)
 	if err != nil {
-		t.Error("failed TestMemoPostAndGetSuccess GetJSON", err, id)
+		t.Error(err)
 	}
 	b, err := json.Marshal(m)
 	if err != nil {
-		t.Error("failed TestMemoPostAndGetSuccess Marshal", err)
+		t.Error(err)
 		return
 	}
 	t.Logf("TestMemoPostAndGetSuccess Get MemoRepository json: %s", b)
 
 	l, err := memo.GetAllMemoList(ctx)
 	if err != nil {
-		t.Error("failed TestMemoPostAndGetSuccess GetAllJSON", err)
+		t.Error(err)
 	}
 	lb, err := json.Marshal(l)
 	if err != nil {
-		t.Error("failed TestMemoPostAndGetSuccess Marshal list", err)
+		t.Error(err)
+		return
+	}
+
+	t.Logf("TestMemoPostAndGetSuccess GetAllJSON MemoRepository json: %s", lb)
+}
+
+func TestMemoPostAndGetMemoInDBSuccess(t *testing.T) {
+	ctx := context.Background()
+
+	// DBでテストした場合
+	memo := NewMemo(getDBRepository())
+
+	connectTestDB()
+	defer closeTestDB()
+
+	text := "Next Memo"
+
+	ipt := &input.PostMemo{Text: text}
+
+	id, err := memo.Post(ctx, *ipt)
+	if err != nil {
+		t.Error(err)
+	}
+
+	iptf := &input.GetMemo{ID: id}
+	m, err := memo.GetMemo(ctx, *iptf)
+	if err != nil {
+		t.Error(err)
+	}
+	b, err := json.Marshal(m)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Logf("TestMemoPostAndGetSuccess Get MemoRepository json: %s", b)
+
+	l, err := memo.GetAllMemoList(ctx)
+	if err != nil {
+		t.Error(err)
+	}
+	lb, err := json.Marshal(l)
+	if err != nil {
+		t.Error(err)
 		return
 	}
 
@@ -53,9 +94,7 @@ func TestMemoGetMemoSuccess(t *testing.T) {
 func TestMemoPostMemoAndTagSuccess(t *testing.T) {
 	ctx := context.Background()
 
-	repoM := memory.NewMemoRepository()
-	repoT := memory.NewTagRepository()
-	memo := NewMemo(repoM, repoT)
+	memo := NewMemo(getInMemoryRepository())
 
 	memoText := "Post Memo And Tag Test"
 	tagTitles := []string{"MemoTest", "UnitTest"}
@@ -104,9 +143,7 @@ func TestMemoPostMemoAndTagSuccess(t *testing.T) {
 func TestMemoSearchTagsAndMemosSuccess(t *testing.T) {
 	ctx := context.Background()
 
-	repoM := memory.NewMemoRepository()
-	repoT := memory.NewTagRepository()
-	memo := NewMemo(repoM, repoT)
+	memo := NewMemo(getInMemoryRepository())
 
 	// test deta post
 	memoTexts := []string{"SearchTagsAndMemos 1", "SearchTagsAndMemos 2"}

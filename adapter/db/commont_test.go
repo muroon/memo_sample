@@ -4,12 +4,12 @@ import (
 	"memo_sample/infra"
 )
 
-// ConnectDB DB接続
+// connectTestDB DB接続
 func connectTestDB() {
 	infra.ConnectTestDB()
 }
 
-// CloseDB DB切断
+// closeTestDB DB切断
 func closeTestDB() {
 	infra.CloseTestDB()
 }
