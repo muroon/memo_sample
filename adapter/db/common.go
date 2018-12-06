@@ -35,14 +35,12 @@ func init() {
 }
 
 // getDB
-func getDB(ctx context.Context) *sql.DB {
+func getDB() *sql.DB {
 	return db
 }
 
 func getTx(ctx context.Context) *sql.Tx {
 	key := getTxKey(ctx)
-	fmt.Println("getTx key:" + key) // TODO:
-
 	return txMap[key]
 }
 
@@ -69,7 +67,7 @@ func deleteTx(ctx context.Context) context.Context {
 
 // begin begin transaction
 func begin(ctx context.Context) (context.Context, error) {
-	t, err := getDB(ctx).BeginTx(ctx, nil)
+	t, err := getDB().BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -106,15 +104,11 @@ func prepare(ctx context.Context, query string) (*sql.Stmt, error) {
 	if isTx(ctx) {
 		stmt, err = getTx(ctx).PrepareContext(ctx, query)
 	} else {
-		stmt, err = getDB(ctx).PrepareContext(ctx, query)
+		stmt, err = getDB().PrepareContext(ctx, query)
 	}
 	if err != nil {
 		return stmt, err
 	}
-
-	// TODO:
-	fmt.Println("prepare query:" + query)
-	fmt.Printf("prepare isTx:%t \n", isTx(ctx))
 
 	return stmt, nil
 }
