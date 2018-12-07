@@ -38,9 +38,6 @@ func TestMutiThreadSuccess(t *testing.T) {
 func executeTestOnThread(word string) {
 	ctx := context.Background()
 
-	//ctx = connectTestDB(ctx)
-	//defer closeTestDB(ctx)
-
 	err := executeTestRepositoryOnThread(ctx, word)
 	if err != nil {
 		errChan <- err

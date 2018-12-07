@@ -4,22 +4,21 @@ import (
 	"context"
 	"database/sql"
 	"memo_sample/domain/model"
-	"memo_sample/infra"
+	"memo_sample/domain/repository"
 	"strconv"
 	"strings"
 )
 
 // NewMemoRepository get repository
-func NewMemoRepository(d *infra.DBM) *MemoRepository {
-	setDBM(d)
-	return &MemoRepository{}
+func NewMemoRepository() repository.MemoRepository {
+	return memoRepository{}
 }
 
-// MemoRepository Memo's Repository Sub
-type MemoRepository struct{}
+// memoRepository Memo's Repository Sub
+type memoRepository struct{}
 
 // Save save Memo Data
-func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
+func (m memoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
 	var err error
 	var res sql.Result
 	query := "insert into memo(text) values(?)"
@@ -42,7 +41,7 @@ func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, er
 }
 
 // Get get Memo Data by ID
-func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
+func (m memoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 	mem := &model.Memo{}
 	var err error
 	query := "select * from memo where id = ?"
@@ -60,7 +59,7 @@ func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 }
 
 // GetAll get all Memo Data
-func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
+func (m memoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select * from memo"
@@ -78,7 +77,7 @@ func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 }
 
 // Search search memo by text
-func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo, error) {
+func (m memoRepository) Search(ctx context.Context, text string) ([]*model.Memo, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select * from memo where text like '%" + text + "%'"
@@ -96,7 +95,7 @@ func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo
 }
 
 // GetAllByIDs get all Memo Data by ID
-func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, error) {
+func (m memoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, error) {
 	idvs := []string{}
 	for _, id := range ids {
 		idvs = append(idvs, strconv.Itoa(id))
@@ -120,7 +119,7 @@ func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.M
 }
 
 // getModelList get model list
-func (m *MemoRepository) getModelList(rows *sql.Rows) ([]*model.Memo, error) {
+func (m memoRepository) getModelList(rows *sql.Rows) ([]*model.Memo, error) {
 	list := []*model.Memo{}
 	for rows.Next() {
 		mem := &model.Memo{}

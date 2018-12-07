@@ -17,5 +17,5 @@ func closeTestDB() {
 
 // getTransactionRepositoryForTest get TransactionRepository
 func getTransactionRepositoryForTest() repository.TransactionRepository {
-	return NewTransactionRepository(infra.GetDBM())
+	return NewTransactionRepository()
 }

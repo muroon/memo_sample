@@ -4,21 +4,22 @@ import (
 	"context"
 	"fmt"
 	"memo_sample/domain/model"
+	"memo_sample/domain/repository"
 	"strings"
 )
 
 // NewMemoRepository get repository
-func NewMemoRepository() *MemoRepository {
-	return &MemoRepository{}
+func NewMemoRepository() repository.MemoRepository {
+	return &memoRepository{[]*model.Memo{}}
 }
 
 // MemoRepository Memo's Repository Sub
-type MemoRepository struct {
+type memoRepository struct {
 	memoList []*model.Memo
 }
 
 // generateID generate Key
-func (m *MemoRepository) generateID(ctx context.Context) (int, error) {
+func (m *memoRepository) generateID(ctx context.Context) (int, error) {
 	const initID int = 1
 
 	if len(m.memoList) == 0 {
@@ -34,7 +35,7 @@ func (m *MemoRepository) generateID(ctx context.Context) (int, error) {
 }
 
 // Save save Memo Data
-func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
+func (m *memoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
 	id, err := m.generateID(ctx)
 	if err != nil {
 		return nil, err
@@ -50,7 +51,7 @@ func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, er
 }
 
 // Get get Memo Data by ID
-func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
+func (m memoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 	for _, ml := range m.memoList {
 		if ml.ID == id {
 			return ml, nil
@@ -60,12 +61,12 @@ func (m MemoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 }
 
 // GetAll get all Memo Data
-func (m *MemoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
+func (m *memoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 	return m.memoList, nil
 }
 
 // Search search memo by text
-func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo, error) {
+func (m *memoRepository) Search(ctx context.Context, text string) ([]*model.Memo, error) {
 	list := []*model.Memo{}
 	for _, memo := range m.memoList {
 		if strings.Index(memo.Text, text) != -1 {
@@ -76,7 +77,7 @@ func (m *MemoRepository) Search(ctx context.Context, text string) ([]*model.Memo
 }
 
 // GetAllByIDs get all Memo Data by ID
-func (m *MemoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, error) {
+func (m *memoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, error) {
 	list := []*model.Memo{}
 	for _, memo := range m.memoList {
 		for _, id := range ids {

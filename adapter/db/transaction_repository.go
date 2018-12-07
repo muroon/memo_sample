@@ -3,12 +3,10 @@ package db
 import (
 	"context"
 	"memo_sample/domain/repository"
-	"memo_sample/infra"
 )
 
 // NewTransactionRepository get repository
-func NewTransactionRepository(d *infra.DBM) repository.TransactionRepository {
-	setDBM(d)
+func NewTransactionRepository() repository.TransactionRepository {
 	return transactionRepository{}
 }
 

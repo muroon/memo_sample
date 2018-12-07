@@ -4,20 +4,19 @@ import (
 	"context"
 	"database/sql"
 	"memo_sample/domain/model"
-	"memo_sample/infra"
+	"memo_sample/domain/repository"
 )
 
 // NewTagRepository get repository
-func NewTagRepository(d *infra.DBM) *TagRepository {
-	setDBM(d)
-	return &TagRepository{}
+func NewTagRepository() repository.TagRepository {
+	return tagRepository{}
 }
 
-// TagRepository Tag's Repository Sub
-type TagRepository struct{}
+// tagRepository Tag's Repository Sub
+type tagRepository struct{}
 
 // Save save Tag Data
-func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, error) {
+func (m tagRepository) Save(ctx context.Context, title string) (*model.Tag, error) {
 	var err error
 	var res sql.Result
 	query := "insert into tag(title) values(?)"
@@ -40,7 +39,7 @@ func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, err
 }
 
 // Get get Tag Data by ID
-func (m TagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
+func (m tagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
 	tag := &model.Tag{}
 	var err error
 	query := "select * from tag where id = ?"
@@ -58,7 +57,7 @@ func (m TagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
 }
 
 // GetAll get all Tag Data
-func (m *TagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
+func (m tagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select * from tag"
@@ -76,7 +75,7 @@ func (m *TagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
 }
 
 // Search search list by title
-func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag, error) {
+func (m tagRepository) Search(ctx context.Context, title string) ([]*model.Tag, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select * from tag where title like '%" + title + "%'"
@@ -94,7 +93,7 @@ func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag,
 }
 
 // SaveTagAndMemo save tag and memo link
-func (m *TagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int) error {
+func (m tagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int) error {
 	var err error
 	query := "insert into tag_memo(tag_id, memo_id) values(?, ?)"
 	stmt, err := prepare(ctx, query)
@@ -107,7 +106,7 @@ func (m *TagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID in
 }
 
 // GetAllByMemoID get all Tag Data By MemoID
-func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, error) {
+func (m tagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select tag.* from tag, tag_memo where tag_memo.memo_id = ? and tag.id = tag_memo.tag_id"
@@ -125,7 +124,7 @@ func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Ta
 }
 
 // SearchMemoIDsByTitle search memo ids by tag's title
-func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, error) {
+func (m tagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, error) {
 	var rows *sql.Rows
 	var err error
 	query := "select tag_memo.memo_id as mid from tag, tag_memo where tag.id = tag_memo.tag_id and tag.title like '%" + title + "%'"
@@ -153,7 +152,7 @@ func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) 
 }
 
 // getModelList get model list
-func (m *TagRepository) getModelList(rows *sql.Rows) ([]*model.Tag, error) {
+func (m tagRepository) getModelList(rows *sql.Rows) ([]*model.Tag, error) {
 	list := []*model.Tag{}
 	for rows.Next() {
 		tag := &model.Tag{}

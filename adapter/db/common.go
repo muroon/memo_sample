@@ -8,11 +8,8 @@ import (
 
 var dbm *infra.DBM
 
-// setDBM set DB manager
-func setDBM(d *infra.DBM) {
-	if dbm == nil {
-		dbm = d
-	}
+func init() {
+	dbm = infra.GetDBM()
 }
 
 // begin begin transaction

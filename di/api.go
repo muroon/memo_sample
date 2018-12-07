@@ -1,7 +1,6 @@
 package di
 
 import (
-	"memo_sample/infra"
 	"memo_sample/interface/api"
 )
 
@@ -12,5 +11,5 @@ func InjectMemoryAPI() api.API {
 
 // InjectDBAPI inject api
 func InjectDBAPI() api.API {
-	return api.NewAPI(InjectMemoUsecase(InjectDBRepository(infra.GetDBM())), InjectLog())
+	return api.NewAPI(InjectMemoUsecase(InjectDBRepository()), InjectLog())
 }

@@ -12,7 +12,7 @@ func getInMemoryRepository() (repository.TransactionRepository, repository.MemoR
 }
 
 func getDBRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository) {
-	return db.NewTransactionRepository(infra.GetDBM()), db.NewMemoRepository(infra.GetDBM()), db.NewTagRepository(infra.GetDBM())
+	return db.NewTransactionRepository(), db.NewMemoRepository(), db.NewTagRepository()
 }
 
 // connectTestDB DB接続

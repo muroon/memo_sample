@@ -4,22 +4,23 @@ import (
 	"context"
 	"fmt"
 	"memo_sample/domain/model"
+	"memo_sample/domain/repository"
 	"strings"
 )
 
 // NewTagRepository get repository
-func NewTagRepository() *TagRepository {
-	return &TagRepository{tagList: []*model.Tag{}, tagMemoMap: map[int]int{}}
+func NewTagRepository() repository.TagRepository {
+	return &tagRepository{tagList: []*model.Tag{}, tagMemoMap: map[int]int{}}
 }
 
-// TagRepository Tag's Repository Sub
-type TagRepository struct {
+// tagRepository Tag's Repository Sub
+type tagRepository struct {
 	tagList    []*model.Tag
 	tagMemoMap map[int]int
 }
 
 // generateID generate Key
-func (m *TagRepository) generateID(ctx context.Context) (int, error) {
+func (m *tagRepository) generateID(ctx context.Context) (int, error) {
 	const initID int = 1
 
 	if len(m.tagList) == 0 {
@@ -35,7 +36,7 @@ func (m *TagRepository) generateID(ctx context.Context) (int, error) {
 }
 
 // Save save Tag Data
-func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, error) {
+func (m *tagRepository) Save(ctx context.Context, title string) (*model.Tag, error) {
 	id, err := m.generateID(ctx)
 	if err != nil {
 		return nil, err
@@ -51,7 +52,7 @@ func (m *TagRepository) Save(ctx context.Context, title string) (*model.Tag, err
 }
 
 // Get get Tag Data by ID
-func (m TagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
+func (m tagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
 	for _, ml := range m.tagList {
 		if ml.ID == id {
 			return ml, nil
@@ -61,12 +62,12 @@ func (m TagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
 }
 
 // GetAll get all Tag Data
-func (m *TagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
+func (m *tagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
 	return m.tagList, nil
 }
 
 // Search search tag by text
-func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag, error) {
+func (m *tagRepository) Search(ctx context.Context, title string) ([]*model.Tag, error) {
 	list := []*model.Tag{}
 	for _, tag := range m.tagList {
 		if strings.Index(tag.Title, title) != -1 {
@@ -77,14 +78,14 @@ func (m *TagRepository) Search(ctx context.Context, title string) ([]*model.Tag,
 }
 
 // SaveTagAndMemo save tag and memo link
-func (m *TagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int) error {
+func (m *tagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int) error {
 	m.tagMemoMap[tagID] = memoID
 
 	return nil
 }
 
 // GetAllByMemoID get all Tag Data By MemoID
-func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, error) {
+func (m *tagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, error) {
 	list := []*model.Tag{}
 
 	for i, v := range m.tagMemoMap {
@@ -104,7 +105,7 @@ func (m *TagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Ta
 }
 
 // SearchMemoIDsByTitle search memo ids by tag's title
-func (m *TagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, error) {
+func (m *tagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, error) {
 	memoIDs := []int{}
 
 	list, err := m.Search(ctx, title)
