@@ -24,18 +24,21 @@ type Memo interface {
 
 // NewMemo generate memo instance
 func NewMemo(
+	transactionRepository repository.TransactionRepository,
 	memoRepository repository.MemoRepository,
 	tagRepository repository.TagRepository,
 ) Memo {
 	return memo{
+		transactionRepository,
 		memoRepository,
 		tagRepository,
 	}
 }
 
 type memo struct {
-	memoRepository repository.MemoRepository
-	tagRepository  repository.TagRepository
+	transactionRepository repository.TransactionRepository
+	memoRepository        repository.MemoRepository
+	tagRepository         repository.TagRepository
 }
 
 func (m memo) ValidatePost(ipt input.PostMemo) error {
@@ -97,16 +100,16 @@ func (m memo) ValidatePostMemoAndTags(ipt input.PostMemoAndTags) error {
 func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*json.PostMemoAndTagsResult, error) {
 	tags := []*model.Tag{}
 
-	ctx, err := m.memoRepository.Begin(ctx)
+	ctx, err := m.transactionRepository.Begin(ctx)
 	if err != nil {
-		m.memoRepository.Rollback(ctx)
+		m.transactionRepository.Rollback(ctx)
 		return nil, err
 	}
 
 	// Memo
 	mo, err := m.memoRepository.Save(ctx, ipt.MemoText)
 	if err != nil {
-		m.memoRepository.Rollback(ctx)
+		m.transactionRepository.Rollback(ctx)
 		return nil, err
 	}
 
@@ -114,7 +117,7 @@ func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*
 		// Tag
 		tg, err := m.tagRepository.Save(ctx, title)
 		if err != nil {
-			m.memoRepository.Rollback(ctx)
+			m.transactionRepository.Rollback(ctx)
 			return nil, err
 		}
 		tags = append(tags, tg)
@@ -122,12 +125,12 @@ func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*
 		// MemoTag
 		err = m.tagRepository.SaveTagAndMemo(ctx, tg.ID, mo.ID)
 		if err != nil {
-			m.memoRepository.Rollback(ctx)
+			m.transactionRepository.Rollback(ctx)
 			return nil, err
 		}
 	}
 
-	m.memoRepository.Commit(ctx)
+	m.transactionRepository.Commit(ctx)
 
 	return &json.PostMemoAndTagsResult{
 		Memo: m.convertMemoJSON(mo),

@@ -69,33 +69,35 @@ func executeTestRepositoryOnThread(ctx context.Context, word string) error {
 func savaContents(ctx context.Context, memoText, tagTitle string) (string, string, error) {
 	repoT := getTagRepositoryForTest()
 	repoM := getMemoRepositoryForTest()
-	ctx, err := repoM.Begin(ctx)
+	repoTx := getTransactionRepositoryForTest()
+
+	ctx, err := repoTx.Begin(ctx)
 	if err != nil {
-		repoM.Rollback(ctx)
+		repoTx.Rollback(ctx)
 		return memoText, tagTitle, err
 	}
 
 	memo, err := repoM.Save(ctx, memoText)
 	if err != nil {
-		repoM.Rollback(ctx)
+		repoTx.Rollback(ctx)
 		return memoText, tagTitle, err
 	}
 
 	tag, err := repoT.Save(ctx, tagTitle)
 	if err != nil {
-		repoT.Rollback(ctx)
+		repoTx.Rollback(ctx)
 		return memoText, tagTitle, err
 	}
 
 	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
-		repoT.Rollback(ctx)
+		repoTx.Rollback(ctx)
 		return memoText, tagTitle, err
 	}
 
-	ctx, err = repoM.Commit(ctx)
+	ctx, err = repoTx.Commit(ctx)
 	if err != nil {
-		repoM.Rollback(ctx)
+		repoTx.Rollback(ctx)
 		return memoText, tagTitle, err
 	}
 

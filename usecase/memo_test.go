@@ -143,7 +143,9 @@ func TestMemoPostMemoAndTagSuccess(t *testing.T) {
 func TestMemoSearchTagsAndMemosSuccess(t *testing.T) {
 	ctx := context.Background()
 
-	memo := NewMemo(getInMemoryRepository())
+	memo := NewMemo(getDBRepository())
+	connectTestDB()
+	defer closeTestDB()
 
 	// test deta post
 	memoTexts := []string{"SearchTagsAndMemos 1", "SearchTagsAndMemos 2"}

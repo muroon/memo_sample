@@ -18,21 +18,6 @@ type TagRepository struct {
 	tagMemoMap map[int]int
 }
 
-// Begin begin transaction
-func (m *TagRepository) Begin(ctx context.Context) (context.Context, error) {
-	return ctx, nil
-}
-
-// Rollback rollback transaction
-func (m *TagRepository) Rollback(ctx context.Context) (context.Context, error) {
-	return ctx, nil
-}
-
-// Commit commit transaction
-func (m *TagRepository) Commit(ctx context.Context) (context.Context, error) {
-	return ctx, nil
-}
-
 // generateID generate Key
 func (m *TagRepository) generateID(ctx context.Context) (int, error) {
 	const initID int = 1

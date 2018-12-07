@@ -1,6 +1,7 @@
 package db
 
 import (
+	"memo_sample/domain/repository"
 	"memo_sample/infra"
 )
 
@@ -12,4 +13,9 @@ func connectTestDB() {
 // closeTestDB DB切断
 func closeTestDB() {
 	infra.CloseTestDB()
+}
+
+// getTransactionRepositoryForTest get TransactionRepository
+func getTransactionRepositoryForTest() repository.TransactionRepository {
+	return NewTransactionRepository(infra.GetDBM())
 }

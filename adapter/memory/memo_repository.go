@@ -17,21 +17,6 @@ type MemoRepository struct {
 	memoList []*model.Memo
 }
 
-// Begin begin transaction
-func (m *MemoRepository) Begin(ctx context.Context) (context.Context, error) {
-	return ctx, nil
-}
-
-// Rollback rollback transaction
-func (m *MemoRepository) Rollback(ctx context.Context) (context.Context, error) {
-	return ctx, nil
-}
-
-// Commit commit transaction
-func (m *MemoRepository) Commit(ctx context.Context) (context.Context, error) {
-	return ctx, nil
-}
-
 // generateID generate Key
 func (m *MemoRepository) generateID(ctx context.Context) (int, error) {
 	const initID int = 1

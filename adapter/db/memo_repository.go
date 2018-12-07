@@ -18,21 +18,6 @@ func NewMemoRepository(d *infra.DBM) *MemoRepository {
 // MemoRepository Memo's Repository Sub
 type MemoRepository struct{}
 
-// Begin begin transaction
-func (m *MemoRepository) Begin(ctx context.Context) (context.Context, error) {
-	return begin(ctx)
-}
-
-// Rollback rollback transaction
-func (m *MemoRepository) Rollback(ctx context.Context) (context.Context, error) {
-	return rollback(ctx)
-}
-
-// Commit commit transaction
-func (m *MemoRepository) Commit(ctx context.Context) (context.Context, error) {
-	return commit(ctx)
-}
-
 // Save save Memo Data
 func (m *MemoRepository) Save(ctx context.Context, text string) (*model.Memo, error) {
 	var err error

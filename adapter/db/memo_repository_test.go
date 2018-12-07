@@ -55,27 +55,31 @@ func TestMemoSaveInDBSuccess(t *testing.T) {
 func TestMemoTransactionCommitSuccess(t *testing.T) {
 
 	repo := getMemoRepositoryForTest()
+	repoTx := getTransactionRepositoryForTest()
 
 	ctx := context.Background()
 
 	connectTestDB()
-	defer closeTestDB()
+	defer func() {
+		if err := recover(); err != nil {
+			repoTx.Rollback(ctx)
+			t.Error(err)
+		}
+		closeTestDB()
+	}()
 
-	ctx, err := repo.Begin(ctx)
+	ctx, err := repoTx.Begin(ctx)
 	if err != nil {
-		repo.Rollback(ctx)
 		panic(err)
 	}
 
 	_, err = repo.Save(ctx, "Transaction Commit Test")
 	if err != nil {
-		repo.Rollback(ctx)
 		panic(err)
 	}
 
-	_, err = repo.Commit(ctx)
+	_, err = repoTx.Commit(ctx)
 	if err != nil {
-		repo.Rollback(ctx)
 		panic(err)
 	}
 }
@@ -83,25 +87,30 @@ func TestMemoTransactionCommitSuccess(t *testing.T) {
 func TestMemoTransactionRollbackSuccess(t *testing.T) {
 
 	repo := getMemoRepositoryForTest()
+	repoTx := getTransactionRepositoryForTest()
 
 	ctx := context.Background()
 
 	connectTestDB()
-	defer closeTestDB()
+	defer func() {
+		if err := recover(); err != nil {
+			repoTx.Rollback(ctx)
+			t.Error(err)
+		}
+		closeTestDB()
+	}()
 
-	ctx, err := repo.Begin(ctx)
+	ctx, err := repoTx.Begin(ctx)
 	if err != nil {
-		repo.Rollback(ctx)
 		panic(err)
 	}
 
 	_, err = repo.Save(ctx, "Transaction Rollback Test")
 	if err != nil {
-		repo.Rollback(ctx)
 		panic(err)
 	}
 
-	repo.Rollback(ctx)
+	repoTx.Rollback(ctx)
 }
 
 func TestMemoSearchSuccess(t *testing.T) {
@@ -116,8 +125,7 @@ func TestMemoSearchSuccess(t *testing.T) {
 	word := "Memo Search Test"
 	_, err := repo.Save(ctx, word)
 	if err != nil {
-		repo.Rollback(ctx)
-		panic(err)
+		t.Error(err)
 	}
 
 	word = "Memo"

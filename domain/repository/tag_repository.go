@@ -7,9 +7,6 @@ import (
 
 // TagRepository Tag's Repository
 type TagRepository interface {
-	Begin(ctx context.Context) (context.Context, error)
-	Rollback(ctx context.Context) (context.Context, error)
-	Commit(ctx context.Context) (context.Context, error)
 	Save(ctx context.Context, title string) (*model.Tag, error)
 	Get(ctx context.Context, id int) (*model.Tag, error)
 	GetAll(ctx context.Context) ([]*model.Tag, error)

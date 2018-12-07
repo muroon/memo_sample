@@ -27,44 +27,42 @@ func TestTagSaveInDBSuccess(t *testing.T) {
 
 func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 
+	repoTx := NewTransactionRepository()
 	repoT := NewTagRepository()
 	repoM := NewMemoRepository()
 
 	ctx := context.Background()
 
-	ctx, err := repoM.Begin(ctx)
+	defer func() {
+		if err := recover(); err != nil {
+			repoTx.Rollback(ctx)
+			t.Error(err)
+		}
+	}()
+
+	ctx, err := repoTx.Begin(ctx)
 	if err != nil {
-		repoM.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
 	memo, err := repoM.Save(ctx, "GetAllByMemoID Test Memo")
 	if err != nil {
-		repoM.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
 	tag, err := repoT.Save(ctx, "GetAllByMemoID Test Tag")
 	if err != nil {
-		repoT.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
 	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
-		repoT.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
-	ctx, err = repoM.Commit(ctx)
+	ctx, err = repoTx.Commit(ctx)
 	if err != nil {
-		repoM.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
 	t.Logf("TestTagAndMemoGetAllByMemoIDSuccess targetMemoID:%d", memo.ID)
@@ -85,44 +83,42 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 
 func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 
+	repoTx := NewTransactionRepository()
 	repoT := NewTagRepository()
 	repoM := NewMemoRepository()
 
 	ctx := context.Background()
 
-	ctx, err := repoM.Begin(ctx)
+	defer func() {
+		if err := recover(); err != nil {
+			repoTx.Rollback(ctx)
+			t.Error(err)
+		}
+	}()
+
+	ctx, err := repoTx.Begin(ctx)
 	if err != nil {
-		repoM.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
 	memo, err := repoM.Save(ctx, "SearchMemoIDsByTitle Test Memo")
 	if err != nil {
-		repoM.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
 	tag, err := repoT.Save(ctx, "SearchMemoIDsByTitle Test Tag")
 	if err != nil {
-		repoT.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
 	err = repoT.SaveTagAndMemo(ctx, tag.ID, memo.ID)
 	if err != nil {
-		repoT.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
-	ctx, err = repoM.Commit(ctx)
+	ctx, err = repoTx.Commit(ctx)
 	if err != nil {
-		repoM.Rollback(ctx)
-		t.Error(err)
-		return
+		panic(err)
 	}
 
 	flag := false

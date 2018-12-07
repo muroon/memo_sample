@@ -8,11 +8,11 @@ import (
 )
 
 // InjectInMemoryRepository inject repository
-func InjectInMemoryRepository() (repository.MemoRepository, repository.TagRepository) {
-	return memory.NewMemoRepository(), memory.NewTagRepository()
+func InjectInMemoryRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository) {
+	return memory.NewTransactionRepository(), memory.NewMemoRepository(), memory.NewTagRepository()
 }
 
 // InjectDBRepository inject repository
-func InjectDBRepository(dbm *infra.DBM) (repository.MemoRepository, repository.TagRepository) {
-	return db.NewMemoRepository(dbm), db.NewTagRepository(dbm)
+func InjectDBRepository(dbm *infra.DBM) (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository) {
+	return db.NewTransactionRepository(dbm), db.NewMemoRepository(dbm), db.NewTagRepository(dbm)
 }

@@ -53,8 +53,7 @@ func TestMemoSearchSuccess(t *testing.T) {
 	word := "Memo Search Test"
 	_, err := repo.Save(ctx, word)
 	if err != nil {
-		repo.Rollback(ctx)
-		panic(err)
+		t.Error(err)
 	}
 
 	word = "Memo"
