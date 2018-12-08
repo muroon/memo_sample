@@ -1,26 +1,32 @@
 package usecase
 
 import (
-	"memo_sample/adapter/db"
-	"memo_sample/adapter/memory"
 	"memo_sample/domain/repository"
-	"memo_sample/infra"
+	"memo_sample/testutil"
 )
 
-func getInMemoryRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository) {
-	return memory.NewTransactionRepository(), memory.NewMemoRepository(), memory.NewTagRepository()
+var testManager testutil.TestManager
+
+func init() {
+	testManager = testutil.NewTestManager()
 }
 
+// getInMemoryRepository get memory repository
+func getInMemoryRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository) {
+	return testManager.GgetInMemoryRepository()
+}
+
+// getDBRepository get db repository
 func getDBRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository) {
-	return db.NewTransactionRepository(), db.NewMemoRepository(), db.NewTagRepository()
+	return testManager.GetDBRepository()
 }
 
 // connectTestDB DB接続
 func connectTestDB() {
-	infra.ConnectTestDB()
+	testManager.ConnectTestDB()
 }
 
 // closeTestDB DB切断
 func closeTestDB() {
-	infra.CloseTestDB()
+	testManager.CloseTestDB()
 }
