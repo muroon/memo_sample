@@ -6,10 +6,16 @@ import (
 
 // InjectMemoryAPI inject api
 func InjectMemoryAPI() api.API {
-	return api.NewAPI(InjectMemoUsecase(InjectInMemoryRepository()), InjectLog())
+	return api.NewAPI(
+		InjectMemoUsecase(InjectInMemoryRepository()),
+		InjectRender(),
+		InjectLog())
 }
 
 // InjectDBAPI inject api
 func InjectDBAPI() api.API {
-	return api.NewAPI(InjectMemoUsecase(InjectDBRepository()), InjectLog())
+	return api.NewAPI(
+		InjectMemoUsecase(InjectDBRepository()),
+		InjectRender(),
+		InjectLog())
 }

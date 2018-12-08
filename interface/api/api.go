@@ -11,14 +11,15 @@ import (
 )
 
 // NewAPI Get API instance
-func NewAPI(memo usecase.Memo, log infra.Log) API {
-	return API{memo, log}
+func NewAPI(memo usecase.Memo, render APIRender, log infra.Log) API {
+	return API{memo, render, log}
 }
 
 // API api instance
 type API struct {
-	memo usecase.Memo
-	log  infra.Log
+	memo   usecase.Memo
+	render APIRender
+	log    infra.Log
 }
 
 // PostMemo post new memo
@@ -32,24 +33,24 @@ func (a API) PostMemo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	iptf := &input.GetMemo{ID: id}
-	v, err := a.memo.GetMemo(ctx, *iptf)
+	memo, err := a.memo.GetMemo(ctx, *iptf)
 	if err != nil {
 		a.HandleError(ctx, w, err)
 	}
 
-	a.JSON(ctx, w, v)
+	a.JSON(ctx, w, a.render.ConvertMemoJSON(memo))
 }
 
 // GetMemos get all memo
 func (a API) GetMemos(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	v, err := a.memo.GetAllMemoList(ctx)
+	memos, err := a.memo.GetAllMemoList(ctx)
 	if err != nil {
 		a.HandleError(ctx, w, err)
 	}
 
-	a.JSON(ctx, w, v)
+	a.JSON(ctx, w, a.render.ConvertMemoJSONList(memos))
 }
 
 // PostMemoAndTags save memo and tags
@@ -64,12 +65,12 @@ func (a API) PostMemoAndTags(w http.ResponseWriter, r *http.Request) {
 		MemoText:  text,
 		TagTitles: titles,
 	}
-	v, err := a.memo.PostMemoAndTags(ctx, *ipt)
+	memo, tags, err := a.memo.PostMemoAndTags(ctx, *ipt)
 	if err != nil {
 		a.HandleError(ctx, w, err)
 	}
 
-	a.JSON(ctx, w, v)
+	a.JSON(ctx, w, a.render.ConvertPostMemoAndTagsResultList(memo, tags))
 }
 
 // SearchTagsAndMemos save memo and tags
@@ -79,12 +80,12 @@ func (a API) SearchTagsAndMemos(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Query().Get("tag_title")
 
 	ipt := &input.SearchTagsAndMemos{TagTitle: title}
-	v, err := a.memo.SearchTagsAndMemos(ctx, *ipt)
+	memos, tags, err := a.memo.SearchTagsAndMemos(ctx, *ipt)
 	if err != nil {
 		a.HandleError(ctx, w, err)
 	}
 
-	a.JSON(ctx, w, v)
+	a.JSON(ctx, w, a.render.ConvertSearchTagsAndMemosResultJSONList(memos, tags))
 }
 
 // HandleError handle error
