@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	infra.ConnectDB()
-	defer infra.CloseDB()
+	(*infra.GetDBM()).ConnectDB()
+	defer (*infra.GetDBM()).CloseDB()
 
 	api := di.InjectDBAPI()
 	http.HandleFunc("/", api.GetMemos)

@@ -16,8 +16,8 @@ func NewTestManager() TestManager {
 type TestManager interface {
 	GgetInMemoryRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository)
 	GetDBRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository)
-	ConnectTestDB()
-	CloseTestDB()
+	ConnectTestDB() error
+	CloseTestDB() error
 }
 
 // testManager test manager
@@ -33,11 +33,11 @@ func (t testManager) GetDBRepository() (repository.TransactionRepository, reposi
 }
 
 // connectTestDB DB接続
-func (t testManager) ConnectTestDB() {
-	infra.ConnectTestDB()
+func (t testManager) ConnectTestDB() error {
+	return (*infra.GetDBM()).ConnectTestDB()
 }
 
 // closeTestDB DB切断
-func (t testManager) CloseTestDB() {
-	infra.CloseTestDB()
+func (t testManager) CloseTestDB() error {
+	return (*infra.GetDBM()).CloseDB()
 }

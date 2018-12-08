@@ -32,7 +32,8 @@ const (
 
 // DBM database manager
 type DBM interface {
-	OpenDB(driverName, dataSourceName string) error
+	ConnectDB() error
+	ConnectTestDB() error
 	CloseDB() error
 	Begin(ctx context.Context) (context.Context, error)
 	Rollback(ctx context.Context) (context.Context, error)
@@ -47,8 +48,8 @@ type dbm struct {
 	stmt  *sql.Stmt
 }
 
-// OpenDB open database
-func (m *dbm) OpenDB(driverName, dataSourceName string) error {
+// openDB open database
+func (m *dbm) openDB(driverName, dataSourceName string) error {
 	var err error
 	m.db, err = sql.Open(driverName, dataSourceName)
 	if err != nil {
@@ -57,8 +58,8 @@ func (m *dbm) OpenDB(driverName, dataSourceName string) error {
 	return nil
 }
 
-// CloseDB close database
-func (m *dbm) CloseDB() error {
+// closeDB close database
+func (m *dbm) closeDB() error {
 	m.stmt.Close()
 	return m.db.Close()
 }

@@ -23,7 +23,9 @@ func getDBRepository() (repository.TransactionRepository, repository.MemoReposit
 
 // connectTestDB DB接続
 func connectTestDB() {
-	testManager.ConnectTestDB()
+	if err := testManager.ConnectTestDB(); err != nil {
+		panic(err)
+	}
 }
 
 // closeTestDB DB切断

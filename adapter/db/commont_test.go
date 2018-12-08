@@ -2,17 +2,18 @@ package db
 
 import (
 	"memo_sample/domain/repository"
-	"memo_sample/infra"
 )
 
 // connectTestDB DB接続
 func connectTestDB() {
-	infra.ConnectTestDB()
+	if err := (*dbm).ConnectTestDB(); err != nil {
+		panic(err)
+	}
 }
 
 // closeTestDB DB切断
 func closeTestDB() {
-	infra.CloseTestDB()
+	(*dbm).CloseDB()
 }
 
 // getTransactionRepositoryForTest get TransactionRepository
