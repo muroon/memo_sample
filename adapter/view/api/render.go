@@ -1,6 +1,7 @@
 package view
 
 import (
+	"fmt"
 	"memo_sample/domain/model"
 	"memo_sample/interface/api"
 	"memo_sample/view/model/json"
@@ -60,4 +61,10 @@ func (m apiRender) ConvertSearchTagsAndMemosResultJSONList(memos []*model.Memo, 
 		Tags:  m.ConvertTagJSONList(tags),
 		Memos: m.ConvertMemoJSONList(memos),
 	}
+}
+
+func (m apiRender) ConvertError(err error) *json.Error {
+	mess := fmt.Sprintf("API: %T(%v)\n", err, err)
+
+	return &json.Error{mess}
 }

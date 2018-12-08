@@ -30,12 +30,14 @@ func (a API) PostMemo(w http.ResponseWriter, r *http.Request) {
 	id, err := a.memo.Post(ctx, *ipt)
 	if err != nil {
 		a.HandleError(ctx, w, err)
+		return
 	}
 
 	iptf := &input.GetMemo{ID: id}
 	memo, err := a.memo.GetMemo(ctx, *iptf)
 	if err != nil {
 		a.HandleError(ctx, w, err)
+		return
 	}
 
 	a.JSON(ctx, w, a.render.ConvertMemoJSON(memo))
@@ -48,6 +50,7 @@ func (a API) GetMemos(w http.ResponseWriter, r *http.Request) {
 	memos, err := a.memo.GetAllMemoList(ctx)
 	if err != nil {
 		a.HandleError(ctx, w, err)
+		return
 	}
 
 	a.JSON(ctx, w, a.render.ConvertMemoJSONList(memos))
@@ -68,6 +71,7 @@ func (a API) PostMemoAndTags(w http.ResponseWriter, r *http.Request) {
 	memo, tags, err := a.memo.PostMemoAndTags(ctx, *ipt)
 	if err != nil {
 		a.HandleError(ctx, w, err)
+		return
 	}
 
 	a.JSON(ctx, w, a.render.ConvertPostMemoAndTagsResultList(memo, tags))
@@ -83,6 +87,7 @@ func (a API) SearchTagsAndMemos(w http.ResponseWriter, r *http.Request) {
 	memos, tags, err := a.memo.SearchTagsAndMemos(ctx, *ipt)
 	if err != nil {
 		a.HandleError(ctx, w, err)
+		return
 	}
 
 	a.JSON(ctx, w, a.render.ConvertSearchTagsAndMemosResultJSONList(memos, tags))
@@ -93,7 +98,7 @@ func (a API) HandleError(ctx context.Context, w http.ResponseWriter, err error) 
 
 	a.log.Errorf("%s", fmt.Sprintf("API: %T(%v)\n", err, err))
 
-	http.Error(w, err.Error(), http.StatusInternalServerError)
+	a.JSON(ctx, w, a.render.ConvertError(err))
 }
 
 // JSON render json format
