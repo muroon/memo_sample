@@ -35,12 +35,25 @@ func setResponseWriter(ctx context.Context, w http.ResponseWriter) context.Conte
 // getResponseWriter
 func getResponseWriter(ctx context.Context) http.ResponseWriter {
 	key := getResKey(ctx)
-	return responseMap[key]
+	var res http.ResponseWriter
+	var ok bool
+	if res, ok = responseMap[key]; !ok {
+		panic(fmt.Errorf("http.ResponseWriter is none. key:%s", key))
+	}
+	return res
 }
 
 // setResKey
 func setResKey(ctx context.Context, value string) context.Context {
 	return context.WithValue(ctx, ContextKey(resKey), value)
+}
+
+// deleteResponseWriter
+func deleteResponseWriter(ctx context.Context) {
+	key := getResKey(ctx)
+	if _, ok := responseMap[key]; ok {
+		delete(responseMap, key)
+	}
 }
 
 // getResKey
