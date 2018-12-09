@@ -3,13 +3,13 @@ package db
 import (
 	"context"
 	"database/sql"
-	"memo_sample/infra"
+	"memo_sample/infra/database"
 )
 
-var dbm *infra.DBM
+var dbm *database.DBM
 
 func init() {
-	dbm = infra.GetDBM()
+	dbm = database.GetDBM()
 }
 
 // begin begin transaction

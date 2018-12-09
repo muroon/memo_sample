@@ -2,13 +2,13 @@ package main
 
 import (
 	"memo_sample/di"
-	"memo_sample/infra"
+	"memo_sample/infra/database"
 	"net/http"
 )
 
 func main() {
-	(*infra.GetDBM()).ConnectDB()
-	defer (*infra.GetDBM()).CloseDB()
+	(*database.GetDBM()).ConnectDB()
+	defer (*database.GetDBM()).CloseDB()
 
 	api := di.InjectDBAPI()
 	http.HandleFunc("/", api.GetMemos)

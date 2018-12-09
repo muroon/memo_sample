@@ -4,7 +4,7 @@ import (
 	"memo_sample/adapter/db"
 	"memo_sample/adapter/memory"
 	"memo_sample/domain/repository"
-	"memo_sample/infra"
+	"memo_sample/infra/database"
 )
 
 // NewTestManager test util
@@ -34,10 +34,10 @@ func (t testManager) GetDBRepository() (repository.TransactionRepository, reposi
 
 // connectTestDB DB接続
 func (t testManager) ConnectTestDB() error {
-	return (*infra.GetDBM()).ConnectTestDB()
+	return (*database.GetDBM()).ConnectTestDB()
 }
 
 // closeTestDB DB切断
 func (t testManager) CloseTestDB() error {
-	return (*infra.GetDBM()).CloseDB()
+	return (*database.GetDBM()).CloseDB()
 }
