@@ -2,5 +2,5 @@
 
 The Sample Code OF "The Clean Architecture"
 
-<img width="1522" alt="overview" src="https://user-images.githubusercontent.com/301822/49685224-38319200-fb23-11e8-8439-48a92ddd5795.png">
+<img width="1522" alt="overview" src="https://user-images.githubusercontent.com/301822/49694318-88fcc580-fbcb-11e8-83b7-827e3c0ef653.png">
 
