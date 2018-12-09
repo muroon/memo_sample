@@ -47,7 +47,7 @@ func (m apiRender) ConvertTagJSONList(list []*model.Tag) []*json.Tag {
 	return listJSON
 }
 
-func (m apiRender) ConvertPostMemoAndTagsResultList(memo *model.Memo, tags []*model.Tag) *json.PostMemoAndTagsResult {
+func (m apiRender) ConvertPostMemoAndTagsResultJSON(memo *model.Memo, tags []*model.Tag) *json.PostMemoAndTagsResult {
 
 	return &json.PostMemoAndTagsResult{
 		Memo: m.ConvertMemoJSON(memo),
@@ -55,7 +55,7 @@ func (m apiRender) ConvertPostMemoAndTagsResultList(memo *model.Memo, tags []*mo
 	}
 }
 
-func (m apiRender) ConvertSearchTagsAndMemosResultJSONList(memos []*model.Memo, tags []*model.Tag) *json.SearchTagsAndMemosResult {
+func (m apiRender) ConvertSearchTagsAndMemosResultJSON(memos []*model.Memo, tags []*model.Tag) *json.SearchTagsAndMemosResult {
 
 	return &json.SearchTagsAndMemosResult{
 		Tags:  m.ConvertTagJSONList(tags),

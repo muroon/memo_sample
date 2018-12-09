@@ -12,3 +12,8 @@ func InjectMemoUsecase(
 	tagagRepository repository.TagRepository) usecase.Memo {
 	return usecase.NewMemo(transactionRepository, memoRepository, tagagRepository)
 }
+
+// InjectUsecaseIterator inject usecase itetator
+func InjectUsecaseIterator(pre usecase.Presenter, memo usecase.Memo) usecase.Interactor {
+	return usecase.NewInteractor(pre, memo)
+}
