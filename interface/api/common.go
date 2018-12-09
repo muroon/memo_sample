@@ -21,8 +21,8 @@ func init() {
 	responseMap = map[string]http.ResponseWriter{}
 }
 
-// setResponseWriter
-func setResponseWriter(ctx context.Context, w http.ResponseWriter) context.Context {
+// addResponseWriter
+func addResponseWriter(ctx context.Context, w http.ResponseWriter) context.Context {
 	key := generateNewKey()
 
 	ctx = setResKey(ctx, key)

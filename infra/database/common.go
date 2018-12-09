@@ -72,7 +72,7 @@ func (m *dbm) Begin(ctx context.Context) (context.Context, error) {
 	}
 
 	// Transaction関連の設定
-	ctx = m.setTx(ctx, t)
+	ctx = m.addTx(ctx, t)
 
 	return ctx, nil
 }
@@ -126,8 +126,8 @@ func (m *dbm) getTx(ctx context.Context) *sql.Tx {
 	return m.txMap[key]
 }
 
-// setTx
-func (m *dbm) setTx(ctx context.Context, t *sql.Tx) context.Context {
+// addTx
+func (m *dbm) addTx(ctx context.Context, t *sql.Tx) context.Context {
 	key := m.generateNewKey()
 	m.txMap[key] = t
 	ctx = m.setTxKey(ctx, key)

@@ -29,7 +29,7 @@ type controller struct {
 func (c controller) PostMemo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctx = setResponseWriter(ctx, w)
+	ctx = addResponseWriter(ctx, w)
 
 	ipt := &input.PostMemo{Text: r.URL.Query().Get("text")}
 	c.it.PostMemo(ctx, *ipt)
@@ -39,7 +39,7 @@ func (c controller) PostMemo(w http.ResponseWriter, r *http.Request) {
 func (c controller) GetMemos(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctx = setResponseWriter(ctx, w)
+	ctx = addResponseWriter(ctx, w)
 
 	c.it.GetMemos(ctx)
 }
@@ -52,7 +52,7 @@ func (c controller) PostMemoAndTags(w http.ResponseWriter, r *http.Request) {
 	text := r.FormValue("memo_text")
 	titles := r.Form["tag_titles[]"]
 
-	ctx = setResponseWriter(ctx, w)
+	ctx = addResponseWriter(ctx, w)
 
 	ipt := &input.PostMemoAndTags{
 		MemoText:  text,
@@ -66,7 +66,7 @@ func (c controller) PostMemoAndTags(w http.ResponseWriter, r *http.Request) {
 func (c controller) SearchTagsAndMemos(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctx = setResponseWriter(ctx, w)
+	ctx = addResponseWriter(ctx, w)
 
 	title := r.URL.Query().Get("tag_title")
 
