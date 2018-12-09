@@ -7,53 +7,54 @@ import (
 	"memo_sample/domain/model"
 	"memo_sample/infra/logger"
 	"memo_sample/usecase"
+	"memo_sample/view/render"
 	"net/http"
 )
 
 // NewPresenter new presenter
-func NewPresenter(render APIRender, log logger.Logger) usecase.Presenter {
+func NewPresenter(render render.JSONRender, log logger.Logger) usecase.Presenter {
 	return presenter{render, log}
 }
 
 type presenter struct {
-	render APIRender
+	render render.JSONRender
 	log    logger.Logger
 }
 
 func (m presenter) ViewMemo(ctx context.Context, md *model.Memo) {
 	w := getResponseWriter(ctx)
 
-	m.JSON(ctx, w, m.render.ConvertMemoJSON(md))
+	m.JSON(ctx, w, m.render.ConvertMemo(md))
 }
 
 func (m presenter) ViewMemoList(ctx context.Context, list []*model.Memo) {
 	w := getResponseWriter(ctx)
 
-	m.JSON(ctx, w, m.render.ConvertMemoJSONList(list))
+	m.JSON(ctx, w, m.render.ConvertMemos(list))
 }
 
 func (m presenter) ViewTag(ctx context.Context, md *model.Tag) {
 	w := getResponseWriter(ctx)
 
-	m.JSON(ctx, w, m.render.ConvertTagJSON(md))
+	m.JSON(ctx, w, m.render.ConvertTag(md))
 }
 
 func (m presenter) ViewTagList(ctx context.Context, list []*model.Tag) {
 	w := getResponseWriter(ctx)
 
-	m.JSON(ctx, w, m.render.ConvertTagJSONList(list))
+	m.JSON(ctx, w, m.render.ConvertTags(list))
 }
 
 func (m presenter) ViewPostMemoAndTagsResult(ctx context.Context, memo *model.Memo, tags []*model.Tag) {
 	w := getResponseWriter(ctx)
 
-	m.JSON(ctx, w, m.render.ConvertPostMemoAndTagsResultJSON(memo, tags))
+	m.JSON(ctx, w, m.render.ConvertPostMemoAndTagsResult(memo, tags))
 }
 
 func (m presenter) ViewSearchTagsAndMemosResult(ctx context.Context, memos []*model.Memo, tags []*model.Tag) {
 	w := getResponseWriter(ctx)
 
-	m.JSON(ctx, w, m.render.ConvertSearchTagsAndMemosResultJSON(memos, tags))
+	m.JSON(ctx, w, m.render.ConvertSearchTagsAndMemosResult(memos, tags))
 }
 
 func (m presenter) ViewError(ctx context.Context, err error) {

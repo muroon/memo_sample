@@ -1,11 +1,11 @@
 package di
 
 import (
-	view "memo_sample/adapter/view/api"
-	"memo_sample/interface/api"
+	"memo_sample/adapter/view/render"
+	"memo_sample/view/render"
 )
 
 // InjectRender inject render
-func InjectRender() api.APIRender {
-	return view.NewAPIRender()
+func InjectRender() render.JSONRender {
+	return view.NewJSONRender()
 }
