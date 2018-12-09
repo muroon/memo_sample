@@ -1,14 +1,13 @@
-package log
+package loggersub
 
 import (
 	"log"
-
-	"memo_sample/infra"
+	"memo_sample/infra/logger"
 )
 
-// NewLog new log manager
-func NewLog() infra.Log {
-	return logm{}
+// NewLogger new log manager
+func NewLogger() logger.Logger {
+	return lggr{}
 }
 
 const (
@@ -25,24 +24,24 @@ const (
 	LogPrefixDebug = "[Debug]"
 )
 
-type logm struct{}
+type lggr struct{}
 
-func (l logm) Errorf(format string, args ...interface{}) {
+func (l lggr) Errorf(format string, args ...interface{}) {
 	log.SetPrefix(LogPrefixError)
 	log.Fatalf(format, args...)
 }
 
-func (l logm) Warnf(format string, args ...interface{}) {
+func (l lggr) Warnf(format string, args ...interface{}) {
 	log.SetPrefix(LogPrefixWarn)
 	log.Fatalf(format, args...)
 }
 
-func (l logm) Infof(format string, args ...interface{}) {
+func (l lggr) Infof(format string, args ...interface{}) {
 	log.SetPrefix(LogPrefixInfo)
 	log.Printf(format, args...)
 }
 
-func (l logm) Debugf(format string, args ...interface{}) {
+func (l lggr) Debugf(format string, args ...interface{}) {
 	log.SetPrefix(LogPrefixDebug)
 	log.Printf(format, args...)
 }

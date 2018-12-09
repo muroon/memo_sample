@@ -1,14 +1,14 @@
 package api
 
 import (
-	"memo_sample/infra"
+	"memo_sample/infra/logger"
 	"memo_sample/usecase"
 	"memo_sample/usecase/input"
 	"net/http"
 )
 
 // NewAPI Get API instance
-func NewAPI(it usecase.Interactor, log infra.Log) API {
+func NewAPI(it usecase.Interactor, log logger.Logger) API {
 	return controller{it, log}
 }
 
@@ -22,7 +22,7 @@ type API interface {
 
 type controller struct {
 	it  usecase.Interactor
-	log infra.Log
+	log logger.Logger
 }
 
 // PostMemo post new memo

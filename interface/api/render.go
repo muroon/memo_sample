@@ -5,7 +5,7 @@ import (
 	"memo_sample/view/model/json"
 )
 
-// APIRender
+// APIRender api render interface
 type APIRender interface {
 	ConvertError(err error) *json.Error
 	ConvertMemoJSON(md *model.Memo) *json.Memo

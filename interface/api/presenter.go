@@ -5,19 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"memo_sample/domain/model"
-	"memo_sample/infra"
+	"memo_sample/infra/logger"
 	"memo_sample/usecase"
 	"net/http"
 )
 
-// NewPresenter
-func NewPresenter(render APIRender, log infra.Log) usecase.Presenter {
+// NewPresenter new presenter
+func NewPresenter(render APIRender, log logger.Logger) usecase.Presenter {
 	return presenter{render, log}
 }
 
 type presenter struct {
 	render APIRender
-	log    infra.Log
+	log    logger.Logger
 }
 
 func (m presenter) ViewMemo(ctx context.Context, md *model.Memo) {
