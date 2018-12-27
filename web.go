@@ -10,7 +10,7 @@ func main() {
 	(*database.GetDBM()).ConnectDB()
 	defer (*database.GetDBM()).CloseDB()
 
-	api := di.InjectDBAPI()
+	api := di.InjectAPIServer()
 	http.HandleFunc("/", api.GetMemos)
 	http.HandleFunc("/post", api.PostMemo)
 	http.HandleFunc("/post/memo_tags", api.PostMemoAndTags)

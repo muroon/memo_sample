@@ -1,6 +1,6 @@
 //+build wireinject
 
-package main
+package di
 
 import (
 	"memo_sample/adapter/db"

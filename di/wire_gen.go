@@ -3,16 +3,17 @@
 //go:generate wire
 //+build !wireinject
 
-package main
+package di
 
 import (
-	"github.com/google/wire"
 	"memo_sample/adapter/db"
 	"memo_sample/adapter/logger"
 	"memo_sample/adapter/memory"
 	"memo_sample/adapter/view/render"
 	"memo_sample/interface/api"
 	"memo_sample/usecase"
+
+	"github.com/google/wire"
 )
 
 // Injectors from injector.go:
