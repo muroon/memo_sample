@@ -13,56 +13,56 @@ import (
 	"github.com/google/wire"
 )
 
-// WireInjectAPI inject api using wire
-var WireInjectAPI = wire.NewSet(
-	WireInjectUsecaseIterator,
+// ProvideAPI inject api using wire
+var ProvideAPI = wire.NewSet(
+	ProvideUsecaseIterator,
 	api.NewAPI,
 )
 
-// WireInjectPresenter inject presenter using wire
-var WireInjectPresenter = wire.NewSet(
-	WireInjectRender,
-	WireInjectLog,
+// ProvidePresenter inject presenter using wire
+var ProvidePresenter = wire.NewSet(
+	ProvideRender,
+	ProvideLog,
 	api.NewPresenter,
 )
 
-// WireInjectMemoUsecase inject memo usecase using wire
-var WireInjectMemoUsecase = wire.NewSet(
-	WireInjectDBRepository, // or WireInjectInMemoryRepository
+// ProvideMemoUsecase inject memo usecase using wire
+var ProvideMemoUsecase = wire.NewSet(
+	ProvideDBRepository, // or ProvideInMemoryRepository
 	usecase.NewMemo,
 )
 
-// WireInjectUsecaseIterator inject usecase itetator using wire
-var WireInjectUsecaseIterator = wire.NewSet(
-	WireInjectPresenter,
-	WireInjectMemoUsecase,
+// ProvideUsecaseIterator inject usecase itetator using wire
+var ProvideUsecaseIterator = wire.NewSet(
+	ProvidePresenter,
+	ProvideMemoUsecase,
 	usecase.NewInteractor,
 )
 
-// WireInjectInMemoryRepository inject repository using wire
-var WireInjectInMemoryRepository = wire.NewSet(
+// ProvideInMemoryRepository inject repository using wire
+var ProvideInMemoryRepository = wire.NewSet(
 	memory.NewTransactionRepository,
 	memory.NewMemoRepository,
 	memory.NewTagRepository,
 )
 
-// WireInjectDBRepository inject repository using wire
-var WireInjectDBRepository = wire.NewSet(
+// ProvideDBRepository inject repository using wire
+var ProvideDBRepository = wire.NewSet(
 	db.NewTransactionRepository,
 	db.NewMemoRepository,
 	db.NewTagRepository,
 )
 
-// WireInjectLog inject log using wire
-var WireInjectLog = wire.NewSet(loggersub.NewLogger)
+// ProvideLog inject log using wire
+var ProvideLog = wire.NewSet(loggersub.NewLogger)
 
-// WireInjectRender inject render using wire
-var WireInjectRender = wire.NewSet(view.NewJSONRender)
+// ProvideRender inject render using wire
+var ProvideRender = wire.NewSet(view.NewJSONRender)
 
 // InjectAPIServer build inject api using wire
 func InjectAPIServer() api.API {
 	wire.Build(
-		WireInjectAPI,
+		ProvideAPI,
 	)
 	return nil
 }

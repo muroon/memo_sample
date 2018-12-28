@@ -6,14 +6,13 @@
 package di
 
 import (
+	"github.com/google/wire"
 	"memo_sample/adapter/db"
 	"memo_sample/adapter/logger"
 	"memo_sample/adapter/memory"
 	"memo_sample/adapter/view/render"
 	"memo_sample/interface/api"
 	"memo_sample/usecase"
-
-	"github.com/google/wire"
 )
 
 // Injectors from injector.go:
@@ -33,36 +32,36 @@ func InjectAPIServer() api.API {
 
 // injector.go:
 
-// WireInjectAPI inject api using wire
-var WireInjectAPI = wire.NewSet(
-	WireInjectUsecaseIterator, api.NewAPI,
+// ProvideAPI inject api using wire
+var ProvideAPI = wire.NewSet(
+	ProvideUsecaseIterator, api.NewAPI,
 )
 
-// WireInjectPresenter inject presenter using wire
-var WireInjectPresenter = wire.NewSet(
-	WireInjectRender,
-	WireInjectLog, api.NewPresenter,
+// ProvidePresenter inject presenter using wire
+var ProvidePresenter = wire.NewSet(
+	ProvideRender,
+	ProvideLog, api.NewPresenter,
 )
 
-// WireInjectMemoUsecase inject memo usecase using wire
-var WireInjectMemoUsecase = wire.NewSet(
-	WireInjectDBRepository, usecase.NewMemo,
+// ProvideMemoUsecase inject memo usecase using wire
+var ProvideMemoUsecase = wire.NewSet(
+	ProvideDBRepository, usecase.NewMemo,
 )
 
-// WireInjectUsecaseIterator inject usecase itetator using wire
-var WireInjectUsecaseIterator = wire.NewSet(
-	WireInjectPresenter,
-	WireInjectMemoUsecase, usecase.NewInteractor,
+// ProvideUsecaseIterator inject usecase itetator using wire
+var ProvideUsecaseIterator = wire.NewSet(
+	ProvidePresenter,
+	ProvideMemoUsecase, usecase.NewInteractor,
 )
 
-// WireInjectInMemoryRepository inject repository using wire
-var WireInjectInMemoryRepository = wire.NewSet(memory.NewTransactionRepository, memory.NewMemoRepository, memory.NewTagRepository)
+// ProvideInMemoryRepository inject repository using wire
+var ProvideInMemoryRepository = wire.NewSet(memory.NewTransactionRepository, memory.NewMemoRepository, memory.NewTagRepository)
 
-// WireInjectDBRepository inject repository using wire
-var WireInjectDBRepository = wire.NewSet(db.NewTransactionRepository, db.NewMemoRepository, db.NewTagRepository)
+// ProvideDBRepository inject repository using wire
+var ProvideDBRepository = wire.NewSet(db.NewTransactionRepository, db.NewMemoRepository, db.NewTagRepository)
 
-// WireInjectLog inject log using wire
-var WireInjectLog = wire.NewSet(loggersub.NewLogger)
+// ProvideLog inject log using wire
+var ProvideLog = wire.NewSet(loggersub.NewLogger)
 
-// WireInjectRender inject render using wire
-var WireInjectRender = wire.NewSet(view.NewJSONRender)
+// ProvideRender inject render using wire
+var ProvideRender = wire.NewSet(view.NewJSONRender)
