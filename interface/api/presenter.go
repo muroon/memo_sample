@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"memo_sample/domain/model"
 	"memo_sample/infra/logger"
 	"memo_sample/usecase"
@@ -67,7 +66,7 @@ func (m presenter) ViewError(ctx context.Context, err error) {
 	defer deleteResponseWriter(ctx)
 	w := getResponseWriter(ctx)
 
-	m.log.Errorf("%s", fmt.Sprintf("API: %T(%v)\n", err, err))
+	m.log.Errorf("API: %T(%+v)\n", err, err)
 
 	m.JSON(ctx, w, m.render.ConvertError(err))
 }

@@ -28,12 +28,12 @@ type lggr struct{}
 
 func (l lggr) Errorf(format string, args ...interface{}) {
 	log.SetPrefix(LogPrefixError)
-	log.Fatalf(format, args...)
+	log.Printf(format, args...)
 }
 
 func (l lggr) Warnf(format string, args ...interface{}) {
 	log.SetPrefix(LogPrefixWarn)
-	log.Fatalf(format, args...)
+	log.Printf(format, args...)
 }
 
 func (l lggr) Infof(format string, args ...interface{}) {

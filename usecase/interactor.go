@@ -21,6 +21,11 @@ type Interactor struct {
 
 // PostMemo post memo
 func (i Interactor) PostMemo(ctx context.Context, ipt input.PostMemo) {
+	err := i.memo.ValidatePost(ipt)
+	if err != nil {
+		i.pre.ViewError(ctx, err)
+		return
+	}
 
 	id, err := i.memo.Post(ctx, ipt)
 	if err != nil {
@@ -52,6 +57,11 @@ func (i Interactor) GetMemos(ctx context.Context) {
 
 // PostMemoAndTags save memo and tags
 func (i Interactor) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) {
+	err := i.memo.ValidatePostMemoAndTags(ipt)
+	if err != nil {
+		i.pre.ViewError(ctx, err)
+		return
+	}
 
 	memo, tags, err := i.memo.PostMemoAndTags(ctx, ipt)
 	if err != nil {
