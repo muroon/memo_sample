@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"memo_sample/domain/repository"
+	"memo_sample/infra/error"
 	"memo_sample/testutil"
 )
 
@@ -12,12 +13,12 @@ func init() {
 }
 
 // getInMemoryRepository get memory repository
-func getInMemoryRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository) {
+func getInMemoryRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository, apperror.ErrorManager) {
 	return testManager.GgetInMemoryRepository()
 }
 
 // getDBRepository get db repository
-func getDBRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository) {
+func getDBRepository() (repository.TransactionRepository, repository.MemoRepository, repository.TagRepository, apperror.ErrorManager) {
 	return testManager.GetDBRepository()
 }
 

@@ -4,6 +4,7 @@ package di
 
 import (
 	"memo_sample/adapter/db"
+	"memo_sample/adapter/error"
 	"memo_sample/adapter/logger"
 	"memo_sample/adapter/memory"
 	view "memo_sample/adapter/view/render"
@@ -24,6 +25,7 @@ var ProvidePresenter = wire.NewSet(
 	ProvideRender,
 	ProvideLog,
 	api.NewPresenter,
+	ProvideErrorManager,
 )
 
 // ProvideMemoUsecase inject memo usecase using wire
@@ -58,6 +60,9 @@ var ProvideLog = wire.NewSet(loggersub.NewLogger)
 
 // ProvideRender inject render using wire
 var ProvideRender = wire.NewSet(view.NewJSONRender)
+
+// ProvideErrorManager inject error manager using wire
+var ProvideErrorManager = wire.NewSet(apperrorsub.NewErrorManager)
 
 // InjectAPIServer build inject api using wire
 func InjectAPIServer() api.API {

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"memo_sample/domain/model"
 	"memo_sample/domain/repository"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -24,12 +25,12 @@ func (m memoRepository) Save(ctx context.Context, text string) (*model.Memo, err
 	query := "insert into memo(text) values(?)"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	res, err = stmt.ExecContext(ctx, text)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	id, err := res.LastInsertId()
@@ -47,12 +48,12 @@ func (m memoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 	query := "select * from memo where id = ?"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	err = stmt.QueryRowContext(ctx, id).Scan(&mem.ID, &mem.Text)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	return mem, err
@@ -65,12 +66,12 @@ func (m memoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 	query := "select * from memo"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	return m.getModelList(rows)
@@ -83,12 +84,12 @@ func (m memoRepository) Search(ctx context.Context, text string) ([]*model.Memo,
 	query := "select * from memo where text like '%" + text + "%'"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	return m.getModelList(rows)
@@ -107,12 +108,12 @@ func (m memoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Me
 	var err error
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	return m.getModelList(rows)
@@ -125,7 +126,7 @@ func (m memoRepository) getModelList(rows *sql.Rows) ([]*model.Memo, error) {
 		mem := &model.Memo{}
 		err := rows.Scan(&mem.ID, &mem.Text)
 		if err != nil {
-			return list, err
+			return list, errm.Wrap(err, http.StatusInternalServerError)
 		}
 		list = append(list, mem)
 	}

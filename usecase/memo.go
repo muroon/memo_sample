@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"memo_sample/domain/model"
 	"memo_sample/domain/repository"
+	"memo_sample/infra/error"
 	"memo_sample/usecase/input"
+	"net/http"
 )
 
 // Memo memo related interface
@@ -26,11 +28,13 @@ func NewMemo(
 	transactionRepository repository.TransactionRepository,
 	memoRepository repository.MemoRepository,
 	tagRepository repository.TagRepository,
+	errm apperror.ErrorManager,
 ) Memo {
 	return memo{
 		transactionRepository,
 		memoRepository,
 		tagRepository,
+		errm,
 	}
 }
 
@@ -38,11 +42,16 @@ type memo struct {
 	transactionRepository repository.TransactionRepository
 	memoRepository        repository.MemoRepository
 	tagRepository         repository.TagRepository
+	errm                  apperror.ErrorManager
 }
 
 func (m memo) ValidatePost(ipt input.PostMemo) error {
 	if ipt.Text == "" {
-		return fmt.Errorf("text parameter is invalid. %s", ipt.Text)
+		err := fmt.Errorf("text parameter is invalid. %s", ipt.Text)
+		return m.errm.Wrap(
+			err,
+			http.StatusBadRequest,
+		)
 	}
 
 	return nil
@@ -58,7 +67,11 @@ func (m memo) Post(ctx context.Context, ipt input.PostMemo) (int, error) {
 
 func (m memo) ValidateGet(ipt input.GetMemo) error {
 	if ipt.ID <= 0 {
-		return fmt.Errorf("ID parameter is invalid. %d", ipt.ID)
+		err := fmt.Errorf("ID parameter is invalid. %d", ipt.ID)
+		return m.errm.Wrap(
+			err,
+			http.StatusBadRequest,
+		)
 	}
 
 	return nil
@@ -84,12 +97,20 @@ func (m memo) GetAllMemoList(ctx context.Context) ([]*model.Memo, error) {
 
 func (m memo) ValidatePostMemoAndTags(ipt input.PostMemoAndTags) error {
 	if ipt.MemoText == "" {
-		return fmt.Errorf("text parameter(MemoText) is invalid. %s", ipt.MemoText)
+		err := fmt.Errorf("text parameter(MemoText) is invalid. %s", ipt.MemoText)
+		return m.errm.Wrap(
+			err,
+			http.StatusBadRequest,
+		)
 	}
 
 	for _, title := range ipt.TagTitles {
 		if title == "" {
-			return fmt.Errorf("text parameter(TagTitles) is invalid. %s", title)
+			err := fmt.Errorf("text parameter(TagTitles) is invalid. %s", title)
+			return m.errm.Wrap(
+				err,
+				http.StatusBadRequest,
+			)
 		}
 	}
 

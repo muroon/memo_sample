@@ -63,8 +63,8 @@ func (m jsonRender) ConvertSearchTagsAndMemosResult(memos []*model.Memo, tags []
 	}
 }
 
-func (m jsonRender) ConvertError(err error) *json.Error {
+func (m jsonRender) ConvertError(err error, code int) *json.Error {
 	mess := fmt.Sprintf("API: %T(%v)\n", err, err)
 
-	return &json.Error{Msg: mess}
+	return &json.Error{Code: code, Msg: mess}
 }

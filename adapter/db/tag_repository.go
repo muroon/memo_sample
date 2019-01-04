@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"memo_sample/domain/model"
 	"memo_sample/domain/repository"
+
+	"net/http"
 )
 
 // NewTagRepository get repository
@@ -22,17 +24,17 @@ func (m tagRepository) Save(ctx context.Context, title string) (*model.Tag, erro
 	query := "insert into tag(title) values(?)"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	res, err = stmt.ExecContext(ctx, title)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	return m.Get(ctx, int(id))
@@ -45,12 +47,12 @@ func (m tagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
 	query := "select * from tag where id = ?"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	err = stmt.QueryRowContext(ctx, id).Scan(&tag.ID, &tag.Title)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	return tag, err
@@ -63,12 +65,12 @@ func (m tagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
 	query := "select * from tag"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	return m.getModelList(rows)
@@ -81,12 +83,12 @@ func (m tagRepository) Search(ctx context.Context, title string) ([]*model.Tag, 
 	query := "select * from tag where title like '%" + title + "%'"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	return m.getModelList(rows)
@@ -98,7 +100,7 @@ func (m tagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int
 	query := "insert into tag_memo(tag_id, memo_id) values(?, ?)"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return err
+		return errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	_, err = stmt.ExecContext(ctx, tagID, memoID)
@@ -112,12 +114,12 @@ func (m tagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag
 	query := "select tag.* from tag, tag_memo where tag_memo.memo_id = ? and tag.id = tag_memo.tag_id"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	rows, err = stmt.QueryContext(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	return m.getModelList(rows)
@@ -130,12 +132,12 @@ func (m tagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) (
 	query := "select tag_memo.memo_id as mid from tag, tag_memo where tag.id = tag_memo.tag_id and tag.title like '%" + title + "%'"
 	stmt, err := prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	rows, err = stmt.QueryContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
 
 	list := []int{}
@@ -143,7 +145,7 @@ func (m tagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) (
 		var mid int64
 		err := rows.Scan(&mid)
 		if err != nil {
-			return list, err
+			return list, errm.Wrap(err, http.StatusInternalServerError)
 		}
 		list = append(list, int(mid))
 	}
@@ -158,7 +160,7 @@ func (m tagRepository) getModelList(rows *sql.Rows) ([]*model.Tag, error) {
 		tag := &model.Tag{}
 		err := rows.Scan(&tag.ID, &tag.Title)
 		if err != nil {
-			return list, err
+			return list, errm.Wrap(err, http.StatusInternalServerError)
 		}
 		list = append(list, tag)
 	}

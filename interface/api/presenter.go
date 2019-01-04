@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"memo_sample/domain/model"
+	"memo_sample/infra/error"
 	"memo_sample/infra/logger"
 	"memo_sample/usecase"
 	"memo_sample/view/render"
@@ -11,13 +12,14 @@ import (
 )
 
 // NewPresenter new presenter
-func NewPresenter(render render.JSONRender, log logger.Logger) usecase.Presenter {
-	return presenter{render, log}
+func NewPresenter(render render.JSONRender, log logger.Logger, errm apperror.ErrorManager) usecase.Presenter {
+	return presenter{render, log, errm}
 }
 
 type presenter struct {
 	render render.JSONRender
 	log    logger.Logger
+	errm   apperror.ErrorManager
 }
 
 func (m presenter) ViewMemo(ctx context.Context, md *model.Memo) {
@@ -66,9 +68,9 @@ func (m presenter) ViewError(ctx context.Context, err error) {
 	defer deleteResponseWriter(ctx)
 	w := getResponseWriter(ctx)
 
-	m.log.Errorf("API: %T(%+v)\n", err, err)
+	m.log.Errorf("API: %s\n", m.errm.LogMessage(err))
 
-	m.JSON(ctx, w, m.render.ConvertError(err))
+	m.JSON(ctx, w, m.render.ConvertError(err, m.errm.Code(err)))
 }
 
 // JSON render json format

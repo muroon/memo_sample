@@ -3,13 +3,18 @@ package db
 import (
 	"context"
 	"database/sql"
+	"memo_sample/adapter/error"
 	"memo_sample/infra/database"
+	"memo_sample/infra/error"
 )
 
 var dbm *database.DBM
 
+var errm apperror.ErrorManager
+
 func init() {
 	dbm = database.GetDBM()
+	errm = apperrorsub.NewErrorManager()
 }
 
 // begin begin transaction
