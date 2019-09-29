@@ -1,6 +1,7 @@
 package database
 
 import (
+	// MySQL driver
 	_ "github.com/go-sql-driver/mysql"
 )
 

@@ -1,6 +1,6 @@
 package logger
 
-// Logger
+// Logger log executer interface
 type Logger interface {
 	Errorf(format string, args ...interface{})
 	Warnf(format string, args ...interface{})

@@ -7,6 +7,7 @@ import (
 	"github.com/srvc/fail"
 )
 
+// NewErrorManager new error Manager
 func NewErrorManager() apperror.ErrorManager {
 	return errorManager{}
 }
