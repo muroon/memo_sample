@@ -2,6 +2,6 @@ package model
 
 // Memo Memo's Entity
 type Memo struct {
-	ID int 
+	ID   int
 	Text string
 }
