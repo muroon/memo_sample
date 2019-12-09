@@ -118,18 +118,22 @@ func (m memo) ValidatePostMemoAndTags(ipt input.PostMemoAndTags) error {
 }
 
 func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*model.Memo, []*model.Tag, error) {
-	tags := []*model.Tag{}
+	tags := make([]*model.Tag, 0)
+
+	defer func() {
+		if err := recover(); err != nil {
+			_, _ = m.transactionRepository.Rollback(ctx)
+		}
+	} ()
 
 	ctx, err := m.transactionRepository.Begin(ctx)
 	if err != nil {
-		m.transactionRepository.Rollback(ctx)
 		return nil, nil, err
 	}
 
 	// Memo
 	mo, err := m.memoRepository.Save(ctx, ipt.MemoText)
 	if err != nil {
-		m.transactionRepository.Rollback(ctx)
 		return nil, nil, err
 	}
 
@@ -137,7 +141,6 @@ func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*
 		// Tag
 		tg, err := m.tagRepository.Save(ctx, title)
 		if err != nil {
-			m.transactionRepository.Rollback(ctx)
 			return nil, nil, err
 		}
 		tags = append(tags, tg)
@@ -145,14 +148,13 @@ func (m memo) PostMemoAndTags(ctx context.Context, ipt input.PostMemoAndTags) (*
 		// MemoTag
 		err = m.tagRepository.SaveTagAndMemo(ctx, tg.ID, mo.ID)
 		if err != nil {
-			m.transactionRepository.Rollback(ctx)
 			return nil, nil, err
 		}
 	}
 
-	m.transactionRepository.Commit(ctx)
+	_, err = m.transactionRepository.Commit(ctx)
 
-	return mo, tags, nil
+	return mo, tags, err
 }
 
 func (m memo) GetTagsByMemo(ctx context.Context, ipt input.GetTagsByMemo) ([]*model.Tag, error) {

@@ -42,7 +42,7 @@ func (m tagRepository) Save(ctx context.Context, title string) (*model.Tag, erro
 
 // Get get Tag Data by ID
 func (m tagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
-	tag := &model.Tag{}
+	tag := new(model.Tag)
 	var err error
 	query := "select * from tag where id = ?"
 	stmt, err := prepare(ctx, query)
@@ -155,7 +155,7 @@ func (m tagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) (
 
 // getModelList get model list
 func (m tagRepository) getModelList(rows *sql.Rows) ([]*model.Tag, error) {
-	list := []*model.Tag{}
+	list := make([]*model.Tag, 0)
 	for rows.Next() {
 		tag := &model.Tag{}
 		err := rows.Scan(&tag.ID, &tag.Title)

@@ -9,10 +9,10 @@ import (
 )
 
 var dm *DBM
+var dbma DBM
 
 // init initialize
 func init() {
-	var dbma DBM
 	dbma = &dbm{txMap: map[string]*sql.Tx{}}
 	dm = &dbma
 }
@@ -79,7 +79,9 @@ func (m *dbm) Begin(ctx context.Context) (context.Context, error) {
 
 // Rollback rollback transaction
 func (m *dbm) Rollback(ctx context.Context) (context.Context, error) {
-	m.getTx(ctx).Rollback()
+	if err := m.getTx(ctx).Rollback(); err != nil {
+		return ctx, err
+	}
 
 	// Transaction関連削除
 	ctx = m.deleteTx(ctx)
@@ -140,10 +142,7 @@ func (m *dbm) addTx(ctx context.Context, t *sql.Tx) context.Context {
 
 // deleteTx
 func (m *dbm) deleteTx(ctx context.Context) context.Context {
-	txKey := m.getTxKey(ctx)
-	if _, ok := m.txMap[txKey]; ok {
-		delete(m.txMap, txKey)
-	}
+	delete(m.txMap, txKey)
 
 	// Transaction開始フラグ
 	return context.WithValue(ctx, ContextKey(txIsKey), false)

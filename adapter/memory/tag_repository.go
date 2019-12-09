@@ -68,9 +68,9 @@ func (m *tagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
 
 // Search search tag by text
 func (m *tagRepository) Search(ctx context.Context, title string) ([]*model.Tag, error) {
-	list := []*model.Tag{}
+	list := make([]*model.Tag, 0, len(m.tagList))
 	for _, tag := range m.tagList {
-		if strings.Index(tag.Title, title) != -1 {
+		if strings.Contains(tag.Title, title) {
 			list = append(list, tag)
 		}
 	}
@@ -86,7 +86,7 @@ func (m *tagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID in
 
 // GetAllByMemoID get all Tag Data By MemoID
 func (m *tagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag, error) {
-	list := []*model.Tag{}
+	list := make([]*model.Tag, 0, len(m.tagMemoMap))
 
 	for i, v := range m.tagMemoMap {
 		if v != id {
@@ -106,7 +106,7 @@ func (m *tagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Ta
 
 // SearchMemoIDsByTitle search memo ids by tag's title
 func (m *tagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) ([]int, error) {
-	memoIDs := []int{}
+	memoIDs := make([]int, 0, len(m.tagMemoMap))
 
 	list, err := m.Search(ctx, title)
 	if err != nil {

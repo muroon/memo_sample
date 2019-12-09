@@ -48,7 +48,7 @@ func (c controller) GetMemos(w http.ResponseWriter, r *http.Request) {
 func (c controller) PostMemoAndTags(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	r.ParseForm()
+	_ = r.ParseForm()
 	text := r.FormValue("memo_text")
 	titles := r.Form["tag_titles[]"]
 

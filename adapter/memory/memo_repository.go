@@ -67,9 +67,9 @@ func (m *memoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 
 // Search search memo by text
 func (m *memoRepository) Search(ctx context.Context, text string) ([]*model.Memo, error) {
-	list := []*model.Memo{}
+	list := make([]*model.Memo, 0, len(m.memoList))
 	for _, memo := range m.memoList {
-		if strings.Index(memo.Text, text) != -1 {
+		if strings.Contains(memo.Text, text) {
 			list = append(list, memo)
 		}
 	}
@@ -78,7 +78,7 @@ func (m *memoRepository) Search(ctx context.Context, text string) ([]*model.Memo
 
 // GetAllByIDs get all Memo Data by ID
 func (m *memoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, error) {
-	list := []*model.Memo{}
+	list := make([]*model.Memo, 0, len(m.memoList))
 	for _, memo := range m.memoList {
 		for _, id := range ids {
 			if memo.ID == id {

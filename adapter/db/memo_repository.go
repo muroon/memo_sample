@@ -43,7 +43,7 @@ func (m memoRepository) Save(ctx context.Context, text string) (*model.Memo, err
 
 // Get get Memo Data by ID
 func (m memoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
-	mem := &model.Memo{}
+	mem := new(model.Memo)
 	var err error
 	query := "select * from memo where id = ?"
 	stmt, err := prepare(ctx, query)
@@ -97,7 +97,7 @@ func (m memoRepository) Search(ctx context.Context, text string) ([]*model.Memo,
 
 // GetAllByIDs get all Memo Data by ID
 func (m memoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Memo, error) {
-	idvs := []string{}
+	idvs := make([]string, 0)
 	for _, id := range ids {
 		idvs = append(idvs, strconv.Itoa(id))
 	}
@@ -121,9 +121,9 @@ func (m memoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Me
 
 // getModelList get model list
 func (m memoRepository) getModelList(rows *sql.Rows) ([]*model.Memo, error) {
-	list := []*model.Memo{}
+	list := make([]*model.Memo, 0)
 	for rows.Next() {
-		mem := &model.Memo{}
+		mem := new(model.Memo)
 		err := rows.Scan(&mem.ID, &mem.Text)
 		if err != nil {
 			return list, errm.Wrap(err, http.StatusInternalServerError)

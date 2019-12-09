@@ -82,5 +82,5 @@ func (m presenter) JSON(ctx context.Context, w http.ResponseWriter, value interf
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(b)
+	_, _ = w.Write(b)
 }

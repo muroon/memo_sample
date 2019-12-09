@@ -40,7 +40,7 @@ func TestTagTransactionCommitSuccess(t *testing.T) {
 	connectTestDB()
 	defer func() {
 		if err := recover(); err != nil {
-			repoTx.Rollback(ctx)
+			_, _ = repoTx.Rollback(ctx)
 			t.Error(err)
 		}
 		closeTestDB()
@@ -73,7 +73,7 @@ func TestTagAndMemoTransactionCommitSuccess(t *testing.T) {
 	connectTestDB()
 	defer func() {
 		if err := recover(); err != nil {
-			repoTx.Rollback(ctx)
+			_, _ = repoTx.Rollback(ctx)
 			t.Error(err)
 		}
 		closeTestDB()
@@ -116,7 +116,7 @@ func TestTagAndMemoTransactionRollbackSuccess(t *testing.T) {
 	connectTestDB()
 	defer func() {
 		if err := recover(); err != nil {
-			repoTx.Rollback(ctx)
+			_, _ = repoTx.Rollback(ctx)
 			t.Error(err)
 		}
 		closeTestDB()
@@ -143,7 +143,7 @@ func TestTagAndMemoTransactionRollbackSuccess(t *testing.T) {
 	}
 
 	// 強制的にロールバック
-	repoTx.Rollback(ctx)
+	_, _ = repoTx.Rollback(ctx)
 }
 
 func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
@@ -156,7 +156,7 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 	connectTestDB()
 	defer func() {
 		if err := recover(); err != nil {
-			repoTx.Rollback(ctx)
+			_, _ = repoTx.Rollback(ctx)
 			t.Error(err)
 		}
 		closeTestDB()
@@ -189,6 +189,9 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 
 	flag := false
 	list, err := repoT.GetAllByMemoID(ctx, memo.ID)
+	if err !=nil {
+		panic(err)
+	}
 	for _, tg := range list {
 		if tg.ID == tag.ID {
 			flag = true
@@ -211,7 +214,7 @@ func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 	connectTestDB()
 	defer func() {
 		if err := recover(); err != nil {
-			repoTx.Rollback(ctx)
+			_, _ = repoTx.Rollback(ctx)
 			t.Error(err)
 		}
 		closeTestDB()
@@ -250,6 +253,9 @@ func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 
 	flag := false
 	list, err := repoT.SearchMemoIDsByTitle(ctx, tag.Title)
+	if err != nil {
+		panic(err)
+	}
 	for _, id := range list {
 		if id == memo.ID {
 			flag = true

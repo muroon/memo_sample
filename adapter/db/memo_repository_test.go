@@ -62,7 +62,7 @@ func TestMemoTransactionCommitSuccess(t *testing.T) {
 	connectTestDB()
 	defer func() {
 		if err := recover(); err != nil {
-			repoTx.Rollback(ctx)
+			_, _ = repoTx.Rollback(ctx)
 			t.Error(err)
 		}
 		closeTestDB()
@@ -94,7 +94,7 @@ func TestMemoTransactionRollbackSuccess(t *testing.T) {
 	connectTestDB()
 	defer func() {
 		if err := recover(); err != nil {
-			repoTx.Rollback(ctx)
+			_, _ = repoTx.Rollback(ctx)
 			t.Error(err)
 		}
 		closeTestDB()
@@ -110,7 +110,7 @@ func TestMemoTransactionRollbackSuccess(t *testing.T) {
 		panic(err)
 	}
 
-	repoTx.Rollback(ctx)
+	_, _ = repoTx.Rollback(ctx)
 }
 
 func TestMemoSearchSuccess(t *testing.T) {

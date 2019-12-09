@@ -109,7 +109,7 @@ func TestMemoPostMemoAndTagSuccess(t *testing.T) {
 		t.Errorf("Memo Save Error: %s", mo.Text)
 	}
 
-	ok := []int{}
+	ok := make([]int, 0, len(tgs))
 	for _, tg := range tgs {
 		for _, title := range tagTitles {
 			if tg.Title == title {
@@ -125,6 +125,9 @@ func TestMemoPostMemoAndTagSuccess(t *testing.T) {
 	// 検索して取得して確認
 	ipt2 := &input.GetTagsByMemo{ID: mo.ID}
 	tgs2, err := memo.GetTagsByMemo(ctx, *ipt2)
+	if err != nil {
+		t.Error(err)
+	}
 
 	ok = []int{}
 	for _, tg := range tgs2 {
@@ -168,13 +171,13 @@ func TestMemoSearchTagsAndMemosSuccess(t *testing.T) {
 
 	// check Tag
 	for _, tag := range tgs {
-		if strings.Index(tag.Title, tagTitle) == -1 {
+		if !strings.Contains(tag.Title, tagTitle) {
 			t.Errorf("Tag And Memo Save Error. tag.Title:%s", tag.Title)
 		}
 	}
 
 	// check Memo
-	ok := []int{}
+	ok := make([]int, 0, len(mos))
 	for _, mm := range mos {
 		for _, memoText := range memoTexts {
 			if mm.Text == memoText {

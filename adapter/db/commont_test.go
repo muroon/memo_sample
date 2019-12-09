@@ -13,7 +13,7 @@ func connectTestDB() {
 
 // closeTestDB DB切断
 func closeTestDB() {
-	(*dbm).CloseDB()
+	_ = (*dbm).CloseDB()
 }
 
 // getTransactionRepositoryForTest get TransactionRepository

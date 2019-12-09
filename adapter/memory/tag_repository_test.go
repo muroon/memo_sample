@@ -35,7 +35,7 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			repoTx.Rollback(ctx)
+			_, _ = repoTx.Rollback(ctx)
 			t.Error(err)
 		}
 	}()
@@ -69,6 +69,10 @@ func TestTagAndMemoGetAllByMemoIDSuccess(t *testing.T) {
 
 	flag := false
 	list, err := repoT.GetAllByMemoID(ctx, memo.ID)
+	if err != nil {
+		panic(err)
+	}
+
 	for _, tg := range list {
 		if tg.ID == tag.ID {
 			flag = true
@@ -91,7 +95,7 @@ func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			repoTx.Rollback(ctx)
+			_, _ = repoTx.Rollback(ctx)
 			t.Error(err)
 		}
 	}()
@@ -123,6 +127,10 @@ func TestTagAndMemoSearchMemoIDsByTitleSuccess(t *testing.T) {
 
 	flag := false
 	list, err := repoT.SearchMemoIDsByTitle(ctx, tag.Title)
+	if err != nil {
+		panic(err)
+	}
+
 	for _, id := range list {
 		if id == memo.ID {
 			flag = true
