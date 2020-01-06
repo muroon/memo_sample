@@ -23,6 +23,7 @@ func (m tagRepository) Save(ctx context.Context, title string) (*model.Tag, erro
 	var res sql.Result
 	query := "insert into tag(title) values(?)"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -46,6 +47,7 @@ func (m tagRepository) Get(ctx context.Context, id int) (*model.Tag, error) {
 	var err error
 	query := "select * from tag where id = ?"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -64,6 +66,7 @@ func (m tagRepository) GetAll(ctx context.Context) ([]*model.Tag, error) {
 	var err error
 	query := "select * from tag"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -82,6 +85,7 @@ func (m tagRepository) Search(ctx context.Context, title string) ([]*model.Tag, 
 	var err error
 	query := "select * from tag where title like '%" + title + "%'"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -99,6 +103,7 @@ func (m tagRepository) SaveTagAndMemo(ctx context.Context, tagID int, memoID int
 	var err error
 	query := "insert into tag_memo(tag_id, memo_id) values(?, ?)"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -113,6 +118,7 @@ func (m tagRepository) GetAllByMemoID(ctx context.Context, id int) ([]*model.Tag
 	var err error
 	query := "select tag.* from tag, tag_memo where tag_memo.memo_id = ? and tag.id = tag_memo.tag_id"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -131,6 +137,7 @@ func (m tagRepository) SearchMemoIDsByTitle(ctx context.Context, title string) (
 	var err error
 	query := "select tag_memo.memo_id as mid from tag, tag_memo where tag.id = tag_memo.tag_id and tag.title like '%" + title + "%'"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}

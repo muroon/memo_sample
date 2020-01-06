@@ -24,6 +24,7 @@ func (m memoRepository) Save(ctx context.Context, text string) (*model.Memo, err
 	var res sql.Result
 	query := "insert into memo(text) values(?)"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -47,6 +48,7 @@ func (m memoRepository) Get(ctx context.Context, id int) (*model.Memo, error) {
 	var err error
 	query := "select * from memo where id = ?"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -65,6 +67,7 @@ func (m memoRepository) GetAll(ctx context.Context) ([]*model.Memo, error) {
 	var err error
 	query := "select * from memo"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -83,6 +86,7 @@ func (m memoRepository) Search(ctx context.Context, text string) ([]*model.Memo,
 	var err error
 	query := "select * from memo where text like '%" + text + "%'"
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
@@ -107,6 +111,7 @@ func (m memoRepository) GetAllByIDs(ctx context.Context, ids []int) ([]*model.Me
 	var rows *sql.Rows
 	var err error
 	stmt, err := prepare(ctx, query)
+	defer stmt.Close()
 	if err != nil {
 		return nil, errm.Wrap(err, http.StatusInternalServerError)
 	}
