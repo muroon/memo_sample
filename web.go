@@ -1,13 +1,21 @@
 package main
 
 import (
+	"log"
 	loggersub "memo_sample/adapter/logger"
 	"memo_sample/di"
 	"memo_sample/infra/database"
 	"net/http"
+
+	_ "net/http/pprof"
 )
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+
+
 	defer func() {
 		_ = (*database.GetDBM()).CloseDB()
 	}()
