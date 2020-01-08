@@ -15,6 +15,11 @@ func (m *dbm) ConnectTestDB() error {
 	return m.openDB("mysql", "root:@/memo_sample_test")
 }
 
+// PingDB DB接続確認
+func (m *dbm) PingDB() error {
+	return m.pingDB()
+}
+
 // CloseDB DB切断
 func (m *dbm) CloseDB() error {
 	return m.closeDB()

@@ -34,6 +34,7 @@ const (
 type DBM interface {
 	ConnectDB() error
 	ConnectTestDB() error
+	PingDB() error
 	CloseDB() error
 	Begin(ctx context.Context) (context.Context, error)
 	Rollback(ctx context.Context) (context.Context, error)
@@ -56,6 +57,10 @@ func (m *dbm) openDB(driverName, dataSourceName string) error {
 		return err
 	}
 	return nil
+}
+
+func (m *dbm) pingDB() error {
+	return m.db.Ping()
 }
 
 // closeDB close database
