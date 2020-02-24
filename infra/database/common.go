@@ -147,7 +147,8 @@ func (m *dbm) addTx(ctx context.Context, t *sql.Tx) context.Context {
 
 // deleteTx
 func (m *dbm) deleteTx(ctx context.Context) context.Context {
-	delete(m.txMap, txKey)
+	key := m.getTxKey(ctx)
+	delete(m.txMap, key)
 
 	// Transaction開始フラグ
 	return context.WithValue(ctx, ContextKey(txIsKey), false)
